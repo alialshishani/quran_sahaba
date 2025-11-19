@@ -12,11 +12,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final baseTheme = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.white,
+        brightness: Brightness.light,
+      ),
+    );
     return MaterialApp(
       title: 'Quran Image Viewer',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 67, 9, 85),
+      theme: baseTheme.copyWith(
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: baseTheme.colorScheme.copyWith(
+          primary: Colors.black,
+          surface: Colors.white,
+          onSurface: Colors.black,
+          inversePrimary: Colors.black87,
+        ),
+        appBarTheme: baseTheme.appBarTheme.copyWith(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 0,
         ),
       ),
       home: const MyHomePage(),
@@ -285,18 +300,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _persistReadingStats() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      _statsStorageKey,
-      jsonEncode(_dailyReadingCounts),
-    );
+    await prefs.setString(_statsStorageKey, jsonEncode(_dailyReadingCounts));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Quran PNG Viewer'),
+        // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // title: const Text('Quran PNG Viewer'),
       ),
       body: switch (_tabIndex) {
         0 => _buildReaderTab(),
@@ -308,8 +320,9 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Theme.of(context).colorScheme.surface,
         selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor:
-            Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+        unselectedItemColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withValues(alpha: 0.6),
         currentIndex: _tabIndex,
         onTap: (index) {
           if (index == _tabIndex) return;
@@ -352,13 +365,13 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0),
-          child: Text(
-            'Page $_currentPage / $_totalPages',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(vertical: 12.0),
+        //   child: Text(
+        //     'Page $_currentPage / $_totalPages',
+        //     style: Theme.of(context).textTheme.titleMedium,
+        //   ),
+        // ),
         Expanded(
           child: PageView.builder(
             controller: _pageController,
@@ -428,9 +441,7 @@ class _MyHomePageState extends State<MyHomePage> {
         final plan = _khetmehPlans[index];
         return Card(
           child: ListTile(
-            leading: CircleAvatar(
-              child: Text('${index + 1}'),
-            ),
+            leading: CircleAvatar(child: Text('${index + 1}')),
             title: Text(plan.title),
             subtitle: Text('${plan.subtitle}\n${plan.rangeDescription}'),
             isThreeLine: true,
@@ -479,30 +490,33 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         const SizedBox(height: 24),
-        Text(
-          'Recent activity',
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text('Recent activity', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 12),
-        ...entries.take(14).map(
-          (entry) => Card(
-            child: ListTile(
-              title: Text(entry.key),
-              trailing: Text('${entry.value} pages'),
+        ...entries
+            .take(14)
+            .map(
+              (entry) => Card(
+                child: ListTile(
+                  title: Text(entry.key),
+                  trailing: Text('${entry.value} pages'),
+                ),
+              ),
             ),
-          ),
-        ),
         if (entries.isEmpty)
-          const Text('No reading activity recorded yet. Start reading to see stats!'),
+          const Text(
+            'No reading activity recorded yet. Start reading to see stats!',
+          ),
       ],
     );
   }
 
   Widget _buildNavigateTab() {
-    final selectedSurah = _surahInfos
-        .firstWhere((surah) => surah.number == _selectedSurahNumber);
-    final selectedJuz =
-        _juzInfos.firstWhere((juz) => juz.number == _selectedJuzNumber);
+    final selectedSurah = _surahInfos.firstWhere(
+      (surah) => surah.number == _selectedSurahNumber,
+    );
+    final selectedJuz = _juzInfos.firstWhere(
+      (juz) => juz.number == _selectedJuzNumber,
+    );
 
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -590,9 +604,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ElevatedButton(
                 onPressed: () {
                   final value = int.tryParse(_pageJumpController.text.trim());
-                  if (value == null ||
-                      value < 1 ||
-                      value > _totalPages) {
+                  if (value == null || value < 1 || value > _totalPages) {
                     _showInvalidPageSnackBar(context);
                     return;
                   }
@@ -617,10 +629,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text(title, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             ...children,
           ],
@@ -637,8 +646,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _navigateToJuz(int juzNumber) {
-    final target =
-        _juzInfos.firstWhere((juz) => juz.number == juzNumber);
+    final target = _juzInfos.firstWhere((juz) => juz.number == juzNumber);
     _navigateToPage(target.page);
   }
 
@@ -691,10 +699,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final today = _todayKey;
     final updatedCount = (_dailyReadingCounts[today] ?? 0) + 1;
     setState(() {
-      _dailyReadingCounts = {
-        ..._dailyReadingCounts,
-        today: updatedCount,
-      };
+      _dailyReadingCounts = {..._dailyReadingCounts, today: updatedCount};
     });
     _persistReadingStats();
   }
@@ -714,8 +719,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   double _calculateTotalAverage() {
     if (_dailyReadingCounts.isEmpty) return 0;
-    final totalPages =
-        _dailyReadingCounts.values.fold<int>(0, (sum, value) => sum + value);
+    final totalPages = _dailyReadingCounts.values.fold<int>(
+      0,
+      (sum, value) => sum + value,
+    );
     return totalPages / _dailyReadingCounts.length;
   }
 }
@@ -748,8 +755,5 @@ class _JuzInfo {
   final int number;
   final int page;
 
-  const _JuzInfo({
-    required this.number,
-    required this.page,
-  });
+  const _JuzInfo({required this.number, required this.page});
 }
