@@ -234,6 +234,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _goToPage(int page) {
     final targetPage = page.clamp(1, _totalPages);
+    if (_currentPage != targetPage) {
+      setState(() {
+        _currentPage = targetPage;
+      });
+      _pageJumpController.text = targetPage.toString();
+      _persistCurrentPage(targetPage);
+    }
     if (_pageController.hasClients) {
       _pageController.animateToPage(
         targetPage - 1,
@@ -243,12 +250,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _pendingPage = null;
     } else {
       _pendingPage = targetPage;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_pendingPage != null && _pageController.hasClients) {
-          _pageController.jumpToPage(_pendingPage! - 1);
-          _pendingPage = null;
-        }
-      });
+      _schedulePendingPageApplication();
     }
   }
 
@@ -260,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _currentPage = savedPage;
       });
       _pageJumpController.text = savedPage.toString();
-      _pageController.jumpToPage(savedPage - 1);
+      _jumpToPageImmediately(savedPage);
     }
   }
 
@@ -310,9 +312,13 @@ class _MyHomePageState extends State<MyHomePage> {
             Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         currentIndex: _tabIndex,
         onTap: (index) {
+          if (index == _tabIndex) return;
           setState(() {
             _tabIndex = index;
           });
+          if (index == 0) {
+            _jumpToPageImmediately(_currentPage);
+          }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Reader'),
@@ -338,6 +344,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildReaderTab() {
+    if (_pendingPage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _applyPendingPage();
+      });
+    }
     return Column(
       children: [
         Padding(
@@ -648,6 +660,31 @@ class _MyHomePageState extends State<MyHomePage> {
         content: Text('Please enter a valid page between 1 and $_totalPages.'),
       ),
     );
+  }
+
+  void _jumpToPageImmediately(int page) {
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(page - 1);
+      _pendingPage = null;
+    } else {
+      _pendingPage = page;
+      _schedulePendingPageApplication();
+    }
+  }
+
+  void _schedulePendingPageApplication() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _applyPendingPage();
+    });
+  }
+
+  void _applyPendingPage() {
+    if (_pendingPage == null || !_pageController.hasClients) {
+      return;
+    }
+    _pageController.jumpToPage(_pendingPage! - 1);
+    _pendingPage = null;
   }
 
   void _recordReadingActivity() {
