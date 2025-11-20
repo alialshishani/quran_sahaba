@@ -10,7 +10,14 @@ import 'tabs/reader_tab.dart';
 import 'tabs/stats_tab.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  const MyHomePage({
+    super.key,
+    required this.isDarkMode,
+    required this.onToggleTheme,
+  });
+
+  final bool isDarkMode;
+  final VoidCallback onToggleTheme;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -152,6 +159,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   onPressed: _toggleChrome,
                 ),
+                IconButton(
+                  icon: Icon(
+                    widget.isDarkMode ? Icons.dark_mode : Icons.sunny,
+                  ),
+                  onPressed: widget.onToggleTheme,
+                ),
               ]
             : null,
       ),
@@ -177,10 +190,10 @@ class _MyHomePageState extends State<MyHomePage> {
             totalPages: _totalPages,
           ),
           3 => StatsTab(
-              dailyReadingCounts: _dailyReadingCounts,
-              weeklyAverage: _calculateWeeklyAverage().toStringAsFixed(1),
-              totalAverage: _calculateTotalAverage().toStringAsFixed(1),
-            ),
+            dailyReadingCounts: _dailyReadingCounts,
+            weeklyAverage: _calculateWeeklyAverage().toStringAsFixed(1),
+            totalAverage: _calculateTotalAverage().toStringAsFixed(1),
+          ),
           _ => const AboutTab(),
         },
       ),
@@ -236,10 +249,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.query_stats),
                     label: 'Statistics',
                   ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings_outlined),
-                  label: 'Settings',
-                ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.settings_outlined),
+                    label: 'Settings',
+                  ),
                 ],
               ),
             ),
@@ -265,6 +278,7 @@ class _MyHomePageState extends State<MyHomePage> {
       onNext: () => _goToPage(_currentPage + 1),
       onPrevious: () => _goToPage(_currentPage - 1),
       bottomBarVisible: _isBottomBarVisible,
+      invertColors: widget.isDarkMode,
     );
   }
 

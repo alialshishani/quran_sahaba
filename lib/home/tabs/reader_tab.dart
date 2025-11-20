@@ -11,6 +11,7 @@ class ReaderTab extends StatelessWidget {
     required this.onNext,
     required this.onPrevious,
     required this.bottomBarVisible,
+    required this.invertColors,
   });
 
   final PageController pageController;
@@ -21,6 +22,7 @@ class ReaderTab extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onPrevious;
   final bool bottomBarVisible;
+  final bool invertColors;
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +38,23 @@ class ReaderTab extends StatelessWidget {
               final pageNumber = index + 1;
               return InteractiveViewer(
                 child: Center(
-                  child: Image.asset(
-                    pageAssetPath(pageNumber),
-                    fit: BoxFit.contain,
-                  ),
+                  child: invertColors
+                      ? ColorFiltered(
+                          colorFilter: const ColorFilter.matrix([
+                            -1, 0, 0, 0, 255, //
+                            0, -1, 0, 0, 255, //
+                            0, 0, -1, 0, 255, //
+                            0, 0, 0, 1, 0, //
+                          ]),
+                          child: Image.asset(
+                            pageAssetPath(pageNumber),
+                            fit: BoxFit.contain,
+                          ),
+                        )
+                      : Image.asset(
+                          pageAssetPath(pageNumber),
+                          fit: BoxFit.contain,
+                        ),
                 ),
               );
             },
