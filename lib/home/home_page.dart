@@ -104,6 +104,12 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setString(_statsStorageKey, jsonEncode(_dailyReadingCounts));
   }
 
+  void _toggleChrome() {
+    setState(() {
+      _isBottomBarVisible = !_isBottomBarVisible;
+    });
+  }
+
   void _handlePageChanged(int index) {
     final updatedPage = index + 1;
     setState(() {
@@ -116,13 +122,42 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showChrome = _tabIndex == 0 ? _isBottomBarVisible : true;
+
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: showChrome
+            ? Theme.of(context).appBarTheme.backgroundColor
+            : Colors.transparent,
+        foregroundColor: showChrome
+            ? Theme.of(context).appBarTheme.foregroundColor
+            : Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: showChrome
+            ? Text(
+                _tabIndex == 0
+                    ? ' ${_currentSurahName ?? 'Surah'}'
+                    : 'Quran Khetmeh',
+              )
+            : const SizedBox.shrink(),
+        automaticallyImplyLeading: false,
+        actions: _tabIndex == 0 && showChrome
+            ? [
+                IconButton(
+                  icon: Icon(
+                    _isBottomBarVisible
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                  ),
+                  onPressed: _toggleChrome,
+                ),
+              ]
+            : null,
+      ),
       body: GestureDetector(
-        onTap: () {
-          setState(() {
-            _isBottomBarVisible = !_isBottomBarVisible;
-          });
-        },
+        behavior: HitTestBehavior.translucent,
+        onTap: _tabIndex == 0 ? _toggleChrome : null,
         child: switch (_tabIndex) {
           0 => _buildReaderTab(),
           1 => KhetmehTab(plans: khetmehPlans),
@@ -142,10 +177,10 @@ class _MyHomePageState extends State<MyHomePage> {
             totalPages: _totalPages,
           ),
           3 => StatsTab(
-            dailyReadingCounts: _dailyReadingCounts,
-            weeklyAverage: _calculateWeeklyAverage().toStringAsFixed(1),
-            totalAverage: _calculateTotalAverage().toStringAsFixed(1),
-          ),
+              dailyReadingCounts: _dailyReadingCounts,
+              weeklyAverage: _calculateWeeklyAverage().toStringAsFixed(1),
+              totalAverage: _calculateTotalAverage().toStringAsFixed(1),
+            ),
           _ => const AboutTab(),
         },
       ),
@@ -154,14 +189,14 @@ class _MyHomePageState extends State<MyHomePage> {
         removeBottom: true,
         removeTop: true,
         child: IgnorePointer(
-          ignoring: !_isBottomBarVisible,
+          ignoring: !showChrome,
           child: AnimatedSlide(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            offset: _isBottomBarVisible ? Offset.zero : const Offset(0, 1),
+            offset: showChrome ? Offset.zero : const Offset(0, 1),
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 200),
-              opacity: _isBottomBarVisible ? 1.0 : 0.0,
+              opacity: showChrome ? 1.0 : 0.0,
               child: BottomNavigationBar(
                 type: BottomNavigationBarType.fixed,
                 selectedFontSize: 12,
@@ -176,6 +211,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   if (index == _tabIndex) return;
                   setState(() {
                     _tabIndex = index;
+                    if (_tabIndex != 0) {
+                      _isBottomBarVisible = true;
+                    }
                   });
                   if (index == 0) {
                     _jumpToPageImmediately(_currentPage);
@@ -198,10 +236,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.query_stats),
                     label: 'Statistics',
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.info_outline),
-                    label: 'About',
-                  ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.settings_outlined),
+                  label: 'Settings',
+                ),
                 ],
               ),
             ),
@@ -308,5 +346,13 @@ class _MyHomePageState extends State<MyHomePage> {
       (sum, value) => sum + value,
     );
     return totalPages / _dailyReadingCounts.length;
+  }
+
+  String? get _currentSurahName {
+    final match = surahInfos.lastWhere(
+      (surah) => surah.page <= _currentPage,
+      orElse: () => surahInfos.first,
+    );
+    return match.name;
   }
 }
