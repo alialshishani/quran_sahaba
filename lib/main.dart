@@ -316,9 +316,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: switch (_tabIndex) {
           0 => _buildReaderTab(),
           1 => _buildKhetmehTab(),
-          2 => _buildStatsTab(),
-          3 => _buildAboutTab(),
-          _ => _buildNavigateTab(),
+          2 => _buildNavigateTab(),
+          3 => _buildStatsTab(),
+          _ => _buildAboutTab(),
         },
       ),
       bottomNavigationBar: MediaQuery.removePadding(
@@ -327,49 +327,55 @@ class _MyHomePageState extends State<MyHomePage> {
         removeTop: true,
         child: IgnorePointer(
           ignoring: !_isBottomBarVisible,
-          child: AnimatedOpacity(
+          child: AnimatedSlide(
             duration: const Duration(milliseconds: 200),
-            opacity: _isBottomBarVisible ? 1.0 : 0.0,
-            child: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              selectedFontSize: 12,
-              unselectedFontSize: 12,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              selectedItemColor: Theme.of(context).colorScheme.primary,
-              unselectedItemColor: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.6),
-              currentIndex: _tabIndex,
-              onTap: (index) {
-                if (index == _tabIndex) return;
-                setState(() {
-                  _tabIndex = index;
-                });
-                if (index == 0) {
-                  _jumpToPageImmediately(_currentPage);
-                }
-              },
-              items: const [
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.menu_book), label: 'Reader'),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.auto_stories),
-                  label: 'Khetmeh',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.query_stats),
-                  label: 'Statistics',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.info_outline),
-                  label: 'About',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.travel_explore),
-                  label: 'Navigate',
-                ),
-              ],
+            curve: Curves.easeInOut,
+            offset: _isBottomBarVisible ? Offset.zero : const Offset(0, 1),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: _isBottomBarVisible ? 1.0 : 0.0,
+              child: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                selectedFontSize: 12,
+                unselectedFontSize: 12,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                selectedItemColor: Theme.of(context).colorScheme.primary,
+                unselectedItemColor: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                currentIndex: _tabIndex,
+                onTap: (index) {
+                  if (index == _tabIndex) return;
+                  setState(() {
+                    _tabIndex = index;
+                  });
+                  if (index == 0) {
+                    _jumpToPageImmediately(_currentPage);
+                  }
+                },
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.menu_book),
+                    label: 'Reader',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.auto_stories),
+                    label: 'Khetmeh',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.travel_explore),
+                    label: 'Navigate',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.query_stats),
+                    label: 'Statistics',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.info_outline),
+                    label: 'About',
+                  ),
+                ],
+              ),
             ),
           ),
         ),
