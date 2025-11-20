@@ -57,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedSurahNumber = 1;
   int _selectedJuzNumber = 1;
   int? _pendingPage;
+  bool _isBottomBarVisible = true;
   Map<String, int> _dailyReadingCounts = {};
   final List<_KhetmehPlan> _khetmehPlans = const [
     _KhetmehPlan(
@@ -306,52 +307,72 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // title: const Text('Quran PNG Viewer'),
-      ),
-      body: switch (_tabIndex) {
-        0 => _buildReaderTab(),
-        1 => _buildKhetmehTab(),
-        2 => _buildStatsTab(),
-        3 => _buildAboutTab(),
-        _ => _buildNavigateTab(),
-      },
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Theme.of(
-          context,
-        ).colorScheme.onSurface.withValues(alpha: 0.6),
-        currentIndex: _tabIndex,
-        onTap: (index) {
-          if (index == _tabIndex) return;
+      body: GestureDetector(
+        onTap: () {
           setState(() {
-            _tabIndex = index;
+            _isBottomBarVisible = !_isBottomBarVisible;
           });
-          if (index == 0) {
-            _jumpToPageImmediately(_currentPage);
-          }
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Reader'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.auto_stories),
-            label: 'Khetmeh',
+        child: switch (_tabIndex) {
+          0 => _buildReaderTab(),
+          1 => _buildKhetmehTab(),
+          2 => _buildStatsTab(),
+          3 => _buildAboutTab(),
+          _ => _buildNavigateTab(),
+        },
+      ),
+      bottomNavigationBar: MediaQuery.removePadding(
+        context: context,
+        removeBottom: true,
+        removeTop: true,
+        child: IgnorePointer(
+          ignoring: !_isBottomBarVisible,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: _isBottomBarVisible ? 1.0 : 0.0,
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              selectedFontSize: 12,
+              unselectedFontSize: 12,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              selectedItemColor: Theme.of(context).colorScheme.primary,
+              unselectedItemColor: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.6),
+              currentIndex: _tabIndex,
+              onTap: (index) {
+                if (index == _tabIndex) return;
+                setState(() {
+                  _tabIndex = index;
+                });
+                if (index == 0) {
+                  _jumpToPageImmediately(_currentPage);
+                }
+              },
+              items: const [
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.menu_book), label: 'Reader'),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.auto_stories),
+                  label: 'Khetmeh',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.query_stats),
+                  label: 'Statistics',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.info_outline),
+                  label: 'About',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.travel_explore),
+                  label: 'Navigate',
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.query_stats),
-            label: 'Statistics',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info_outline),
-            label: 'About',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.travel_explore),
-            label: 'Navigate',
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -363,16 +384,9 @@ class _MyHomePageState extends State<MyHomePage> {
         _applyPendingPage();
       });
     }
-    return Column(
+    return Stack(
       children: [
-        // Padding(
-        //   padding: const EdgeInsets.symmetric(vertical: 12.0),
-        //   child: Text(
-        //     'Page $_currentPage / $_totalPages',
-        //     style: Theme.of(context).textTheme.titleMedium,
-        //   ),
-        // ),
-        Expanded(
+        Positioned.fill(
           child: PageView.builder(
             controller: _pageController,
             reverse: true, // right-to-left page order
@@ -399,21 +413,35 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () => _goToPage(_currentPage + 1),
-                icon: const Icon(Icons.arrow_back),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Opacity(
+            opacity: _isBottomBarVisible ? 1.0 : 0.0,
+            child: IgnorePointer(
+              ignoring: !_isBottomBarVisible,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12.0,
+                  horizontal: 16.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () => _goToPage(_currentPage + 1),
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+                    Text(_currentPage.toString()),
+                    IconButton(
+                      onPressed: () => _goToPage(_currentPage - 1),
+                      icon: const Icon(Icons.arrow_forward),
+                    ),
+                  ],
+                ),
               ),
-              Text(_currentPage.toString()),
-              IconButton(
-                onPressed: () => _goToPage(_currentPage - 1),
-                icon: const Icon(Icons.arrow_forward),
-              ),
-            ],
+            ),
           ),
         ),
       ],
