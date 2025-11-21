@@ -32,7 +32,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static const int _totalPages = 604;
-  static const String _storageKey = 'current_page';
+  static const String _khetmehProgressKey = 'khetmeh_progress';
+  static const String _selectedKhetmehKey = 'selected_khetmeh';
   static const String _statsStorageKey = 'reading_stats';
   late final PageController _pageController;
   final TextEditingController _pageJumpController = TextEditingController();
@@ -43,13 +44,16 @@ class _MyHomePageState extends State<MyHomePage> {
   int? _pendingPage;
   bool _isBottomBarVisible = true;
   Map<String, int> _dailyReadingCounts = {};
+  Map<String, int> _khetmehProgress = {};
+  String _selectedKhetmeh = '';
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentPage - 1);
     _pageJumpController.text = _currentPage.toString();
-    _loadCurrentPage();
+    _loadKhetmehProgress();
+    _loadSelectedKhetmeh();
     _loadReadingStats();
   }
 
@@ -69,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _currentPage = targetPage;
       });
       _pageJumpController.text = targetPage.toString();
-      _persistCurrentPage(targetPage);
+      _persistKhetmehProgress();
     }
     if (_pageController.hasClients) {
       _pageController.animateToPage(
@@ -84,21 +88,39 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> _loadCurrentPage() async {
+  Future<void> _loadKhetmehProgress() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedPage = prefs.getInt(_storageKey);
-    if (savedPage != null && savedPage != _currentPage) {
+    final progress = prefs.getString(_khetmehProgressKey);
+    if (progress != null) {
       setState(() {
-        _currentPage = savedPage;
+        _khetmehProgress = (jsonDecode(progress) as Map<String, dynamic>).map(
+          (key, value) => MapEntry(key, (value as num).toInt()),
+        );
       });
-      _pageJumpController.text = savedPage.toString();
-      _jumpToPageImmediately(savedPage);
     }
   }
 
-  Future<void> _persistCurrentPage(int page) async {
+  Future<void> _persistKhetmehProgress() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_storageKey, page);
+    _khetmehProgress[_selectedKhetmeh] = _currentPage;
+    await prefs.setString(_khetmehProgressKey, jsonEncode(_khetmehProgress));
+  }
+
+  Future<void> _loadSelectedKhetmeh() async {
+    final prefs = await SharedPreferences.getInstance();
+    final selectedKhetmeh = prefs.getString(_selectedKhetmehKey);
+    if (selectedKhetmeh != null) {
+      setState(() {
+        _selectedKhetmeh = selectedKhetmeh;
+        _currentPage = _khetmehProgress[_selectedKhetmeh] ?? 1;
+        _jumpToPageImmediately(_currentPage);
+      });
+    }
+  }
+
+  Future<void> _persistSelectedKhetmeh() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_selectedKhetmehKey, _selectedKhetmeh);
   }
 
   Future<void> _loadReadingStats() async {
@@ -131,7 +153,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     _pageJumpController.text = updatedPage.toString();
     _recordReadingActivity();
-    _persistCurrentPage(updatedPage);
+    _persistKhetmehProgress();
+  }
+
+  void _handlePlanSelected(String planTitle) {
+    setState(() {
+      _selectedKhetmeh = planTitle;
+      _currentPage = _khetmehProgress[planTitle] ?? 1;
+      _jumpToPageImmediately(_currentPage);
+      _tabIndex = 0;
+    });
+    _persistSelectedKhetmeh();
   }
 
   @override
@@ -163,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: _tabIndex == 0 ? _toggleChrome : null,
         child: switch (_tabIndex) {
           0 => _buildReaderTab(),
-          1 => const KhetmehTab(),
+          1 => KhetmehTab(onPlanSelected: _handlePlanSelected),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,
             selectedJuzNumber: _selectedJuzNumber,
