@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran_sahaba/l10n/app_localizations.dart';
 
 class StatsTab extends StatelessWidget {
   const StatsTab({
@@ -14,6 +15,7 @@ class StatsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final entries = dailyReadingCounts.entries.toList()
       ..sort((a, b) => b.key.compareTo(a.key));
 
@@ -22,7 +24,7 @@ class StatsTab extends StatelessWidget {
       children: [
         Card(
           child: ListTile(
-            title: const Text('Pages read today'),
+            title: Text(l.statsPagesReadToday),
             trailing: Text(
               '${dailyReadingCounts[_todayKey] ?? 0}',
               style: Theme.of(context).textTheme.headlineSmall,
@@ -31,7 +33,7 @@ class StatsTab extends StatelessWidget {
         ),
         Card(
           child: ListTile(
-            title: const Text('Average pages per day (last 7 days)'),
+            title: Text(l.statsWeeklyAverage),
             trailing: Text(
               weeklyAverage,
               style: Theme.of(context).textTheme.headlineSmall,
@@ -40,7 +42,7 @@ class StatsTab extends StatelessWidget {
         ),
         Card(
           child: ListTile(
-            title: const Text('Overall daily average'),
+            title: Text(l.statsOverallAverage),
             trailing: Text(
               totalAverage,
               style: Theme.of(context).textTheme.headlineSmall,
@@ -48,7 +50,8 @@ class StatsTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        Text('Recent activity', style: Theme.of(context).textTheme.titleMedium),
+        Text(l.statsRecentActivity,
+            style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 12),
         ...entries
             .take(14)
@@ -56,13 +59,13 @@ class StatsTab extends StatelessWidget {
               (entry) => Card(
                 child: ListTile(
                   title: Text(entry.key),
-                  trailing: Text('${entry.value} pages'),
+                  trailing: Text(l.statsPages(entry.value)),
                 ),
               ),
             ),
         if (entries.isEmpty)
-          const Text(
-            'No reading activity recorded yet. Start reading to see stats!',
+          Text(
+            l.statsNoActivity,
           ),
       ],
     );

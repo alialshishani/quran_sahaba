@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran_sahaba/l10n/app_localizations.dart';
 
 import '../../models/quran_data.dart';
 
@@ -28,6 +29,7 @@ class NavigateTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final selectedSurah = surahInfos.firstWhere(
       (surah) => surah.number == selectedSurahNumber,
     );
@@ -40,7 +42,7 @@ class NavigateTab extends StatelessWidget {
       children: [
         _navigationCard(
           context: context,
-          title: 'Navigate by Surah',
+          title: l.navigateBySurah,
           children: [
             DropdownButton<int>(
               isExpanded: true,
@@ -49,7 +51,9 @@ class NavigateTab extends StatelessWidget {
                   .map(
                     (surah) => DropdownMenuItem(
                       value: surah.number,
-                      child: Text('${surah.number}. ${surah.name}'),
+                      child: Text(
+                        '${surah.number}. ${Localizations.localeOf(context).languageCode == 'ar' ? surah.nameAr : surah.nameEn}',
+                      ),
                     ),
                   )
                   .toList(),
@@ -58,13 +62,13 @@ class NavigateTab extends StatelessWidget {
                 onSurahChanged(value);
               },
             ),
-            Text('Starts on page ${selectedSurah.page}'),
+            Text(l.startsOnPage(selectedSurah.page)),
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
                 onPressed: () => onGoToSurah(selectedSurah.number),
-                child: const Text('Go to Surah'),
+                child: Text(l.goToSurah),
               ),
             ),
           ],
@@ -72,7 +76,7 @@ class NavigateTab extends StatelessWidget {
         const SizedBox(height: 16),
         _navigationCard(
           context: context,
-          title: 'Navigate by Juz',
+          title: l.navigateByJuz,
           children: [
             DropdownButton<int>(
               isExpanded: true,
@@ -81,7 +85,7 @@ class NavigateTab extends StatelessWidget {
                   .map(
                     (juz) => DropdownMenuItem(
                       value: juz.number,
-                      child: Text('Juz ${juz.number} (page ${juz.page})'),
+                      child: Text('${l.juz} ${juz.number} (${l.pageNumber} ${juz.page})'),
                     ),
                   )
                   .toList(),
@@ -90,13 +94,13 @@ class NavigateTab extends StatelessWidget {
                 onJuzChanged(value);
               },
             ),
-            Text('Starts on page ${selectedJuz.page}'),
+            Text(l.startsOnPage(selectedJuz.page)),
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
                 onPressed: () => onGoToJuz(selectedJuz.number),
-                child: const Text('Go to Juz'),
+                child: Text(l.goToJuz),
               ),
             ),
           ],
@@ -104,14 +108,14 @@ class NavigateTab extends StatelessWidget {
         const SizedBox(height: 16),
         _navigationCard(
           context: context,
-          title: 'Navigate by Page',
+          title: l.navigateByPage,
           children: [
             TextField(
               controller: pageJumpController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Page number',
-                helperText: 'Enter a page between 1 and 604',
+              decoration: InputDecoration(
+                labelText: l.pageNumber,
+                helperText: l.enterPageNumber,
               ),
             ),
             const SizedBox(height: 12),
@@ -127,7 +131,7 @@ class NavigateTab extends StatelessWidget {
                   }
                   onGoToPage(value);
                 },
-                child: const Text('Go to Page'),
+                child: Text(l.goToPage),
               ),
             ),
           ],
@@ -159,7 +163,7 @@ class NavigateTab extends StatelessWidget {
   void _showInvalidPageSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Please enter a valid page between 1 and $totalPages.'),
+        content: Text(AppLocalizations.of(context)!.invalidPageNumber(totalPages)),
       ),
     );
   }

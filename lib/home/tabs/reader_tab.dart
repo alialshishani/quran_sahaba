@@ -76,19 +76,50 @@ class ReaderTab extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
+                    _arrowWithUnderline(
+                      context: context,
+                      icon: Icons.arrow_back,
                       onPressed: onNext,
-                      icon: const Icon(Icons.arrow_back),
+                      showUnderline: currentPage.isEven,
                     ),
                     Text(currentPage.toString()),
-                    IconButton(
+                    _arrowWithUnderline(
+                      context: context,
+                      icon: Icons.arrow_forward,
                       onPressed: onPrevious,
-                      icon: const Icon(Icons.arrow_forward),
+                      showUnderline: currentPage.isOdd,
                     ),
                   ],
                 ),
               ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _arrowWithUnderline({
+    required BuildContext context,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required bool showUnderline,
+  }) {
+    final underlineColor =
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          onPressed: onPressed,
+          icon: Icon(icon),
+        ),
+        Container(
+          width: 24,
+          height: 2,
+          decoration: BoxDecoration(
+            color: showUnderline ? underlineColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(2),
           ),
         ),
       ],

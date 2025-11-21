@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:quran_sahaba/l10n/app_localizations.dart';
 
 import '../../models/quran_data.dart';
 
 class KhetmehTab extends StatelessWidget {
-  const KhetmehTab({super.key, required this.plans});
-
-  final List<KhetmehPlan> plans;
+  const KhetmehTab({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final plans = getKhetmehPlans(l);
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {

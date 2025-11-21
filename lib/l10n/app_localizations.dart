@@ -1,0 +1,380 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations_ar.dart';
+import 'app_localizations_en.dart';
+
+// ignore_for_file: type=lint
+
+/// Callers can lookup localized strings with an instance of AppLocalizations
+/// returned by `AppLocalizations.of(context)`.
+///
+/// Applications need to include `AppLocalizations.delegate()` in their app's
+/// `localizationDelegates` list, and the locales they support in the app's
+/// `supportedLocales` list. For example:
+///
+/// ```dart
+/// import 'l10n/app_localizations.dart';
+///
+/// return MaterialApp(
+///   localizationsDelegates: AppLocalizations.localizationsDelegates,
+///   supportedLocales: AppLocalizations.supportedLocales,
+///   home: MyApplicationHome(),
+/// );
+/// ```
+///
+/// ## Update pubspec.yaml
+///
+/// Please make sure to update your pubspec.yaml to include the following
+/// packages:
+///
+/// ```yaml
+/// dependencies:
+///   # Internationalization support.
+///   flutter_localizations:
+///     sdk: flutter
+///   intl: any # Use the pinned version from flutter_localizations
+///
+///   # Rest of dependencies
+/// ```
+///
+/// ## iOS Applications
+///
+/// iOS applications define key application metadata, including supported
+/// locales, in an Info.plist file that is built into the application bundle.
+/// To configure the locales supported by your app, you’ll need to edit this
+/// file.
+///
+/// First, open your project’s ios/Runner.xcworkspace Xcode workspace file.
+/// Then, in the Project Navigator, open the Info.plist file under the Runner
+/// project’s Runner folder.
+///
+/// Next, select the Information Property List item, select Add Item from the
+/// Editor menu, then select Localizations from the pop-up menu.
+///
+/// Select and expand the newly-created Localizations item then, for each
+/// locale your application supports, add a new item and select the locale
+/// you wish to add from the pop-up menu in the Value field. This list should
+/// be consistent with the languages listed in the AppLocalizations.supportedLocales
+/// property.
+abstract class AppLocalizations {
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+
+  final String localeName;
+
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  /// A list of this localizations delegate along with the default localizations
+  /// delegates.
+  ///
+  /// Returns a list of localizations delegates containing this delegate along with
+  /// GlobalMaterialLocalizations.delegate, GlobalCupertinoLocalizations.delegate,
+  /// and GlobalWidgetsLocalizations.delegate.
+  ///
+  /// Additional delegates can be added by appending to this list in
+  /// MaterialApp. This list does not have to be used at all if a custom list
+  /// of delegates is preferred or required.
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
+
+  /// A list of this localizations delegate's supported locales.
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('ar'),
+    Locale('en'),
+  ];
+
+  /// No description provided for @appTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quran Sahaba'**
+  String get appTitle;
+
+  /// No description provided for @helloWorld.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello World!'**
+  String get helloWorld;
+
+  /// No description provided for @reader.
+  ///
+  /// In en, this message translates to:
+  /// **'Reader'**
+  String get reader;
+
+  /// No description provided for @khetmeh.
+  ///
+  /// In en, this message translates to:
+  /// **'Khetmeh'**
+  String get khetmeh;
+
+  /// No description provided for @navigate.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate'**
+  String get navigate;
+
+  /// No description provided for @statistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get statistics;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @navigateBySurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate by Surah'**
+  String get navigateBySurah;
+
+  /// No description provided for @startsOnPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts on page {page}'**
+  String startsOnPage(Object page);
+
+  /// No description provided for @goToSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Surah'**
+  String get goToSurah;
+
+  /// No description provided for @navigateByJuz.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate by Juz'**
+  String get navigateByJuz;
+
+  /// No description provided for @juz.
+  ///
+  /// In en, this message translates to:
+  /// **'Juz'**
+  String get juz;
+
+  /// No description provided for @goToJuz.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Juz'**
+  String get goToJuz;
+
+  /// No description provided for @navigateByPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate by Page'**
+  String get navigateByPage;
+
+  /// No description provided for @pageNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Page number'**
+  String get pageNumber;
+
+  /// No description provided for @enterPageNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a page between 1 and 604'**
+  String get enterPageNumber;
+
+  /// No description provided for @goToPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Page'**
+  String get goToPage;
+
+  /// No description provided for @invalidPageNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid page between 1 and {totalPages}'**
+  String invalidPageNumber(Object totalPages);
+
+  /// No description provided for @khetmehPlan1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'30 Days'**
+  String get khetmehPlan1Title;
+
+  /// No description provided for @khetmehPlan1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'1 juz per day'**
+  String get khetmehPlan1Subtitle;
+
+  /// No description provided for @khetmehPlan1Range.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages 1-604'**
+  String get khetmehPlan1Range;
+
+  /// No description provided for @khetmehPlan2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'15 Days'**
+  String get khetmehPlan2Title;
+
+  /// No description provided for @khetmehPlan2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'2 juz per day'**
+  String get khetmehPlan2Subtitle;
+
+  /// No description provided for @khetmehPlan2Range.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages 1-604 split in half'**
+  String get khetmehPlan2Range;
+
+  /// No description provided for @khetmehPlan3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get khetmehPlan3Title;
+
+  /// No description provided for @khetmehPlan3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'~4 juz per day'**
+  String get khetmehPlan3Subtitle;
+
+  /// No description provided for @khetmehPlan3Range.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish every Friday'**
+  String get khetmehPlan3Range;
+
+  /// No description provided for @khetmehPlan4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend Focus'**
+  String get khetmehPlan4Title;
+
+  /// No description provided for @khetmehPlan4Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Juz 1-15 Sat, 16-30 Sun'**
+  String get khetmehPlan4Subtitle;
+
+  /// No description provided for @khetmehPlan4Range.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages 1-302 then 303-604'**
+  String get khetmehPlan4Range;
+
+  /// No description provided for @statsPagesReadToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages read today'**
+  String get statsPagesReadToday;
+
+  /// No description provided for @statsWeeklyAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average pages per day (last 7 days)'**
+  String get statsWeeklyAverage;
+
+  /// No description provided for @statsOverallAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall daily average'**
+  String get statsOverallAverage;
+
+  /// No description provided for @statsRecentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent activity'**
+  String get statsRecentActivity;
+
+  /// No description provided for @statsPages.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pages'**
+  String statsPages(Object count);
+
+  /// No description provided for @statsNoActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'No reading activity recorded yet. Start reading to see stats!'**
+  String get statsNoActivity;
+
+  /// No description provided for @aboutText.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe through the Quran PNG pages using the Reader tab.\nUse the arrows or tabs at the bottom to navigate.'**
+  String get aboutText;
+
+  /// No description provided for @surah.
+  ///
+  /// In en, this message translates to:
+  /// **'Surah'**
+  String get surah;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @showHideChrome.
+  ///
+  /// In en, this message translates to:
+  /// **'Show/Hide Chrome'**
+  String get showHideChrome;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) =>
+      <String>['ar', 'en'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'ar':
+      return AppLocalizationsAr();
+    case 'en':
+      return AppLocalizationsEn();
+  }
+
+  throw FlutterError(
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
+}

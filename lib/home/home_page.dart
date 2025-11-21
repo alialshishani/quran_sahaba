@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:quran_sahaba/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/quran_data.dart';
-import 'tabs/about_tab.dart';
+import 'tabs/settings_tab.dart';
 import 'tabs/khetmeh_tab.dart';
 import 'tabs/navigate_tab.dart';
 import 'tabs/reader_tab.dart';
@@ -14,10 +15,12 @@ class MyHomePage extends StatefulWidget {
     super.key,
     required this.isDarkMode,
     required this.onToggleTheme,
+    required this.onToggleLocale,
   });
 
   final bool isDarkMode;
   final VoidCallback onToggleTheme;
+  final VoidCallback onToggleLocale;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -144,36 +147,18 @@ class _MyHomePageState extends State<MyHomePage> {
         title: showChrome
             ? Text(
                 _tabIndex == 0
-                    ? ' ${_currentSurahName ?? 'Surah'}'
-                    : 'Quran Khetmeh',
+                    ? ' ${_currentSurahName ?? AppLocalizations.of(context)!.surah}'
+                    : AppLocalizations.of(context)!.khetmeh,
               )
             : const SizedBox.shrink(),
         automaticallyImplyLeading: false,
-        actions: _tabIndex == 0 && showChrome
-            ? [
-                IconButton(
-                  icon: Icon(
-                    _isBottomBarVisible
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
-                  onPressed: _toggleChrome,
-                ),
-                IconButton(
-                  icon: Icon(
-                    widget.isDarkMode ? Icons.dark_mode : Icons.sunny,
-                  ),
-                  onPressed: widget.onToggleTheme,
-                ),
-              ]
-            : null,
       ),
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: _tabIndex == 0 ? _toggleChrome : null,
         child: switch (_tabIndex) {
           0 => _buildReaderTab(),
-          1 => KhetmehTab(plans: khetmehPlans),
+          1 => const KhetmehTab(),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,
             selectedJuzNumber: _selectedJuzNumber,
@@ -194,7 +179,13 @@ class _MyHomePageState extends State<MyHomePage> {
             weeklyAverage: _calculateWeeklyAverage().toStringAsFixed(1),
             totalAverage: _calculateTotalAverage().toStringAsFixed(1),
           ),
-          _ => const AboutTab(),
+          _ => SettingsTab(
+              onToggleLocale: widget.onToggleLocale,
+              onToggleTheme: widget.onToggleTheme,
+              onToggleChrome: _toggleChrome,
+              isDarkMode: widget.isDarkMode,
+              isBottomBarVisible: _isBottomBarVisible,
+            ),
         },
       ),
       bottomNavigationBar: MediaQuery.removePadding(
@@ -232,26 +223,26 @@ class _MyHomePageState extends State<MyHomePage> {
                     _jumpToPageImmediately(_currentPage);
                   }
                 },
-                items: const [
+                items: [
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.menu_book),
-                    label: 'Reader',
+                    icon: const Icon(Icons.menu_book),
+                    label: AppLocalizations.of(context)!.reader,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.auto_stories),
-                    label: 'Khetmeh',
+                    icon: const Icon(Icons.auto_stories),
+                    label: AppLocalizations.of(context)!.khetmeh,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.travel_explore),
-                    label: 'Navigate',
+                    icon: const Icon(Icons.travel_explore),
+                    label: AppLocalizations.of(context)!.navigate,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.query_stats),
-                    label: 'Statistics',
+                    icon: const Icon(Icons.query_stats),
+                    label: AppLocalizations.of(context)!.statistics,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.settings_outlined),
-                    label: 'Settings',
+                    icon: const Icon(Icons.settings_outlined),
+                    label: AppLocalizations.of(context)!.settings,
                   ),
                 ],
               ),
@@ -363,10 +354,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String? get _currentSurahName {
+    final locale = Localizations.localeOf(context);
     final match = surahInfos.lastWhere(
       (surah) => surah.page <= _currentPage,
       orElse: () => surahInfos.first,
     );
-    return match.name;
+    return locale.languageCode == 'ar' ? match.nameAr : match.nameEn;
   }
 }
