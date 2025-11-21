@@ -2,6 +2,7 @@ import 'package:quran_sahaba/l10n/app_localizations.dart';
 import 'package:quran_sahaba/models/surah_names_ar.dart';
 
 class KhetmehPlan {
+  final String id;
   final String title;
   final String subtitle;
   final String rangeDescription;
@@ -10,6 +11,7 @@ class KhetmehPlan {
   final int durationInDays;
 
   const KhetmehPlan({
+    required this.id,
     required this.title,
     required this.subtitle,
     required this.rangeDescription,
@@ -43,6 +45,7 @@ class JuzInfo {
 List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
   return [
     KhetmehPlan(
+      id: 'plan1',
       title: l.khetmehPlan1Title,
       subtitle: l.khetmehPlan1Subtitle,
       rangeDescription: l.khetmehPlan1Range,
@@ -51,6 +54,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       durationInDays: 30,
     ),
     KhetmehPlan(
+      id: 'plan2',
       title: l.khetmehPlan2Title,
       subtitle: l.khetmehPlan2Subtitle,
       rangeDescription: l.khetmehPlan2Range,
@@ -59,6 +63,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       durationInDays: 15,
     ),
     KhetmehPlan(
+      id: 'plan3',
       title: l.khetmehPlan3Title,
       subtitle: l.khetmehPlan3Subtitle,
       rangeDescription: l.khetmehPlan3Range,
@@ -67,6 +72,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       durationInDays: 7,
     ),
     KhetmehPlan(
+      id: 'plan4',
       title: l.khetmehPlan4Title,
       subtitle: l.khetmehPlan4Subtitle,
       rangeDescription: l.khetmehPlan4Range,
@@ -75,6 +81,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       durationInDays: 2,
     ),
     KhetmehPlan(
+      id: 'plan5',
       title: l.khetmehPlan5Title,
       subtitle: l.khetmehPlan5Subtitle,
       rangeDescription: l.khetmehPlan5Range,

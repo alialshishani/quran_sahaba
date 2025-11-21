@@ -24,11 +24,11 @@ class KhetmehTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
         final plan = plans[index];
-        final currentPage = khetmehProgress[plan.title] ?? plan.startPage;
+        final currentPage = khetmehProgress[plan.id] ?? plan.startPage;
         final progress = (currentPage - plan.startPage) /
             (plan.endPage - plan.startPage);
         final remainingTotalPages = plan.endPage - currentPage;
-        final completions = khetmehCompletionCounts[plan.title] ?? 0;
+        final completions = khetmehCompletionCounts[plan.id] ?? 0;
 
         // Calculate pages per day for this plan
         final pagesPerDay = plan.durationInDays > 0
@@ -40,7 +40,7 @@ class KhetmehTab extends StatelessWidget {
 
         // Get pages read today for this specific khetmeh
         final pagesReadTodayForThisKhetmeh =
-            khetmehDailyReadingCounts[plan.title]?[todayKey] ?? 0;
+            khetmehDailyReadingCounts[plan.id]?[todayKey] ?? 0;
 
         // Calculate remaining pages for today
         int remainingPagesToday = 0;
@@ -59,7 +59,7 @@ class KhetmehTab extends StatelessWidget {
 
         return Card(
           child: GestureDetector(
-            onTap: () => onPlanSelected(plan.title),
+            onTap: () => onPlanSelected(plan.id),
             child: ListTile(
               leading: CircleAvatar(child: Text('${index + 1}')),
               title: Text(plan.title),

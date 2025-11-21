@@ -33,7 +33,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const int _totalPages = 604;
   static const String _khetmehProgressKey = 'khetmeh_progress';
-  static const String _selectedKhetmehKey = 'selected_khetmeh';
+  static const String _selectedKhetmehKey = 'selected_khetmeh_id'; // Changed to id
   static const String _khetmehCompletionCountsKey = 'khetmeh_completion_counts';
   static const String _statsStorageKey = 'reading_stats_v2'; // Updated key
   late final PageController _pageController;
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String, Map<String, int>> _khetmehDailyReadingCounts = {}; // New data structure
   Map<String, int> _khetmehProgress = {};
   Map<String, int> _khetmehCompletionCounts = {};
-  String _selectedKhetmeh = '';
+  String _selectedKhetmehId = ''; // Changed to id
 
   @override
   void initState() {
@@ -70,14 +70,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String _pageAssetPath(int page) => 'Quran-PNG-master/$page.jpg';
 
   void _goToPage(int page) {
-    if (_selectedKhetmeh.isNotEmpty && page > _totalPages) {
+    if (_selectedKhetmehId.isNotEmpty && page > _totalPages) {
       final currentKhetmeh = getKhetmehPlans(
               AppLocalizations.of(context)!)
-          .firstWhere((plan) => plan.title == _selectedKhetmeh);
+          .firstWhere((plan) => plan.id == _selectedKhetmehId);
       if (currentKhetmeh.durationInDays > 0) {
         setState(() {
-          _khetmehCompletionCounts[_selectedKhetmeh] =
-              (_khetmehCompletionCounts[_selectedKhetmeh] ?? 0) + 1;
+          _khetmehCompletionCounts[_selectedKhetmehId] =
+              (_khetmehCompletionCounts[_selectedKhetmehId] ?? 0) + 1;
           _currentPage = currentKhetmeh.startPage;
         });
         _persistKhetmehCompletionCounts();
@@ -121,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _persistKhetmehProgress() async {
     final prefs = await SharedPreferences.getInstance();
-    _khetmehProgress[_selectedKhetmeh] = _currentPage;
+    _khetmehProgress[_selectedKhetmehId] = _currentPage;
     await prefs.setString(_khetmehProgressKey, jsonEncode(_khetmehProgress));
   }
 
@@ -146,11 +146,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadSelectedKhetmeh() async {
     final prefs = await SharedPreferences.getInstance();
-    final selectedKhetmeh = prefs.getString(_selectedKhetmehKey);
-    if (selectedKhetmeh != null) {
+    final selectedKhetmehId = prefs.getString(_selectedKhetmehKey);
+    if (selectedKhetmehId != null) {
       setState(() {
-        _selectedKhetmeh = selectedKhetmeh;
-        _currentPage = _khetmehProgress[_selectedKhetmeh] ?? 1;
+        _selectedKhetmehId = selectedKhetmehId;
+        _currentPage = _khetmehProgress[_selectedKhetmehId] ?? 1;
         _jumpToPageImmediately(_currentPage);
       });
     }
@@ -158,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _persistSelectedKhetmeh() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_selectedKhetmehKey, _selectedKhetmeh);
+    await prefs.setString(_selectedKhetmehKey, _selectedKhetmehId);
   }
 
   Future<void> _loadReadingStats() async {
@@ -168,9 +168,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // Decode the outer map
     final decodedOuter = jsonDecode(data) as Map<String, dynamic>;
     final Map<String, Map<String, int>> tempMap = {};
-    decodedOuter.forEach((khetmehTitle, dailyCounts) {
+    decodedOuter.forEach((khetmehId, dailyCounts) {
       if (dailyCounts is Map) {
-        tempMap[khetmehTitle] = (dailyCounts).map(
+        tempMap[khetmehId] = (dailyCounts).map(
           (key, value) => MapEntry(key as String, (value as num).toInt()),
         );
       }
@@ -202,10 +202,10 @@ class _MyHomePageState extends State<MyHomePage> {
     _persistKhetmehProgress();
   }
 
-  void _handlePlanSelected(String planTitle) {
+  void _handlePlanSelected(String planId) {
     setState(() {
-      _selectedKhetmeh = planTitle;
-      _currentPage = _khetmehProgress[planTitle] ?? 1;
+      _selectedKhetmehId = planId;
+      _currentPage = _khetmehProgress[planId] ?? 1;
       _jumpToPageImmediately(_currentPage);
       _tabIndex = 0;
     });
@@ -215,6 +215,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final bool showChrome = _tabIndex == 0 ? _isBottomBarVisible : true;
+    final selectedKhetmehPlan = _selectedKhetmehId.isNotEmpty
+        ? getKhetmehPlans(AppLocalizations.of(context)!)
+            .firstWhere((plan) => plan.id == _selectedKhetmehId)
+        : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -237,9 +241,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         : AppLocalizations.of(context)!.khetmeh,
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                  if (_tabIndex == 0 && _selectedKhetmeh.isNotEmpty)
+                  if (_tabIndex == 0 && selectedKhetmehPlan != null)
                     Text(
-                      _selectedKhetmeh,
+                      selectedKhetmehPlan.title,
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
@@ -428,10 +432,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _recordReadingActivity() {
-    if (_selectedKhetmeh.isEmpty) return; // Only record if a khetmeh is selected
+    if (_selectedKhetmehId.isEmpty) return; // Only record if a khetmeh is selected
     final today = _todayKey;
-    _khetmehDailyReadingCounts.putIfAbsent(_selectedKhetmeh, () => {});
-    final currentKhetmehTodayCounts = _khetmehDailyReadingCounts[_selectedKhetmeh]!;
+    _khetmehDailyReadingCounts.putIfAbsent(_selectedKhetmehId, () => {});
+    final currentKhetmehTodayCounts =
+        _khetmehDailyReadingCounts[_selectedKhetmehId]!;
     final updatedCount = (currentKhetmehTodayCounts[today] ?? 0) + 1;
     setState(() {
       currentKhetmehTodayCounts[today] = updatedCount;
