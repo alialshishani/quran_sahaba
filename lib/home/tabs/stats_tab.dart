@@ -7,16 +7,31 @@ class StatsTab extends StatelessWidget {
     required this.dailyReadingCounts,
     required this.weeklyAverage,
     required this.totalAverage,
+    required this.allDailyReadingCounts,
   });
 
-  final Map<String, int> dailyReadingCounts;
+  final int dailyReadingCounts;
   final String weeklyAverage;
   final String totalAverage;
+  final Map<String, Map<String, int>> allDailyReadingCounts;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    final entries = dailyReadingCounts.entries.toList()
+    
+    // Flatten allDailyReadingCounts into a single map for recent activity display
+    final Map<String, int> flattenedDailyCounts = {};
+    allDailyReadingCounts.forEach((khetmehTitle, dailyCounts) {
+      dailyCounts.forEach((date, count) {
+        flattenedDailyCounts.update(
+          date,
+          (value) => value + count,
+          ifAbsent: () => count,
+        );
+      });
+    });
+
+    final entries = flattenedDailyCounts.entries.toList()
       ..sort((a, b) => b.key.compareTo(a.key));
 
     return ListView(
@@ -26,7 +41,7 @@ class StatsTab extends StatelessWidget {
           child: ListTile(
             title: Text(l.statsPagesReadToday),
             trailing: Text(
-              '${dailyReadingCounts[_todayKey] ?? 0}',
+              '$dailyReadingCounts',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),

@@ -44,5 +44,8 @@
   "theme": "Theme",
   "khetmehPlan5Title": "Free Roam",
   "khetmehPlan5Subtitle": "Read at your own pace",
-  "khetmehPlan5Range": "No specific plan, just read."
+  "khetmehPlan5Range": "No specific plan, just read.",
+  "pagesRemaining": "{count} pages remaining",
+  "expectedCompletionDate": "Expected completion: {date}",
+  "pagesToReadToday": "{count} pages to read today"
 }

@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const int _totalPages = 604;
   static const String _khetmehProgressKey = 'khetmeh_progress';
   static const String _selectedKhetmehKey = 'selected_khetmeh';
-  static const String _statsStorageKey = 'reading_stats';
+  static const String _statsStorageKey = 'reading_stats_v2'; // Updated key
   late final PageController _pageController;
   final TextEditingController _pageJumpController = TextEditingController();
   int _currentPage = 1;
@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedJuzNumber = juzInfos.first.number;
   int? _pendingPage;
   bool _isBottomBarVisible = true;
-  Map<String, int> _dailyReadingCounts = {};
+  Map<String, Map<String, int>> _khetmehDailyReadingCounts = {}; // New data structure
   Map<String, int> _khetmehProgress = {};
   String _selectedKhetmeh = '';
 
@@ -127,17 +127,25 @@ class _MyHomePageState extends State<MyHomePage> {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString(_statsStorageKey);
     if (data == null) return;
-    final decoded = (jsonDecode(data) as Map<String, dynamic>).map(
-      (key, value) => MapEntry(key, (value as num).toInt()),
-    );
+    // Decode the outer map
+    final decodedOuter = jsonDecode(data) as Map<String, dynamic>;
+    final Map<String, Map<String, int>> tempMap = {};
+    decodedOuter.forEach((khetmehTitle, dailyCounts) {
+      if (dailyCounts is Map) {
+        tempMap[khetmehTitle] = (dailyCounts).map(
+          (key, value) => MapEntry(key as String, (value as num).toInt()),
+        );
+      }
+    });
     setState(() {
-      _dailyReadingCounts = decoded;
+      _khetmehDailyReadingCounts = tempMap;
     });
   }
 
   Future<void> _persistReadingStats() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_statsStorageKey, jsonEncode(_dailyReadingCounts));
+    await prefs.setString(
+        _statsStorageKey, jsonEncode(_khetmehDailyReadingCounts));
   }
 
   void _toggleChrome() {
@@ -214,6 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
           1 => KhetmehTab(
               onPlanSelected: _handlePlanSelected,
               khetmehProgress: _khetmehProgress,
+              khetmehDailyReadingCounts: _khetmehDailyReadingCounts,
             ),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,
@@ -231,9 +240,10 @@ class _MyHomePageState extends State<MyHomePage> {
             totalPages: _totalPages,
           ),
           3 => StatsTab(
-            dailyReadingCounts: _dailyReadingCounts,
+            dailyReadingCounts: _getDailyReadingCountsSum,
             weeklyAverage: _calculateWeeklyAverage().toStringAsFixed(1),
             totalAverage: _calculateTotalAverage().toStringAsFixed(1),
+            allDailyReadingCounts: _khetmehDailyReadingCounts,
           ),
           _ => SettingsTab(
               onToggleLocale: widget.onToggleLocale,
@@ -379,34 +389,54 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _recordReadingActivity() {
+    if (_selectedKhetmeh.isEmpty) return; // Only record if a khetmeh is selected
     final today = _todayKey;
-    final updatedCount = (_dailyReadingCounts[today] ?? 0) + 1;
+    _khetmehDailyReadingCounts.putIfAbsent(_selectedKhetmeh, () => {});
+    final currentKhetmehTodayCounts = _khetmehDailyReadingCounts[_selectedKhetmeh]!;
+    final updatedCount = (currentKhetmehTodayCounts[today] ?? 0) + 1;
     setState(() {
-      _dailyReadingCounts = {..._dailyReadingCounts, today: updatedCount};
+      currentKhetmehTodayCounts[today] = updatedCount;
     });
     _persistReadingStats();
   }
 
   String get _todayKey => DateTime.now().toIso8601String().split('T').first;
 
+  int get _getDailyReadingCountsSum {
+    final today = _todayKey;
+    int total = 0;
+    _khetmehDailyReadingCounts.forEach((khetmehTitle, dailyCounts) {
+      total += (dailyCounts[today] ?? 0);
+    });
+    return total;
+  }
+
   double _calculateWeeklyAverage() {
-    final today = DateTime.now();
+    if (_khetmehDailyReadingCounts.isEmpty) return 0;
+
     double total = 0;
+    final today = DateTime.now();
     for (int i = 0; i < 7; i++) {
       final day = today.subtract(Duration(days: i));
       final key = day.toIso8601String().split('T').first;
-      total += (_dailyReadingCounts[key] ?? 0);
+      _khetmehDailyReadingCounts.forEach((khetmehTitle, dailyCounts) {
+        total += (dailyCounts[key] ?? 0);
+      });
     }
     return total / 7;
   }
 
   double _calculateTotalAverage() {
-    if (_dailyReadingCounts.isEmpty) return 0;
-    final totalPages = _dailyReadingCounts.values.fold<int>(
-      0,
-      (sum, value) => sum + value,
-    );
-    return totalPages / _dailyReadingCounts.length;
+    if (_khetmehDailyReadingCounts.isEmpty) return 0;
+    int totalPages = 0;
+    int totalDays = 0;
+    _khetmehDailyReadingCounts.forEach((khetmehTitle, dailyCounts) {
+      dailyCounts.forEach((date, count) {
+        totalPages += count;
+        totalDays++;
+      });
+    });
+    return totalDays > 0 ? totalPages / totalDays : 0;
   }
 
   String? get _currentSurahName {

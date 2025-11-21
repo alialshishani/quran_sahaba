@@ -7,6 +7,7 @@ class KhetmehPlan {
   final String rangeDescription;
   final int startPage;
   final int endPage;
+  final int durationInDays;
 
   const KhetmehPlan({
     required this.title,
@@ -14,6 +15,7 @@ class KhetmehPlan {
     required this.rangeDescription,
     required this.startPage,
     required this.endPage,
+    required this.durationInDays,
   });
 }
 
@@ -46,6 +48,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       rangeDescription: l.khetmehPlan1Range,
       startPage: 1,
       endPage: 604,
+      durationInDays: 30,
     ),
     KhetmehPlan(
       title: l.khetmehPlan2Title,
@@ -53,6 +56,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       rangeDescription: l.khetmehPlan2Range,
       startPage: 1,
       endPage: 604,
+      durationInDays: 15,
     ),
     KhetmehPlan(
       title: l.khetmehPlan3Title,
@@ -60,6 +64,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       rangeDescription: l.khetmehPlan3Range,
       startPage: 1,
       endPage: 604,
+      durationInDays: 7,
     ),
     KhetmehPlan(
       title: l.khetmehPlan4Title,
@@ -67,6 +72,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       rangeDescription: l.khetmehPlan4Range,
       startPage: 1,
       endPage: 604,
+      durationInDays: 2,
     ),
     KhetmehPlan(
       title: l.khetmehPlan5Title,
@@ -74,6 +80,7 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       rangeDescription: l.khetmehPlan5Range,
       startPage: 1,
       endPage: 604,
+      durationInDays: 0,
     ),
   ];
 }

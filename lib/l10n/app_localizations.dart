@@ -355,6 +355,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No specific plan, just read.'**
   String get khetmehPlan5Range;
+
+  /// No description provided for @pagesRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pages remaining'**
+  String pagesRemaining(Object count);
+
+  /// No description provided for @expectedCompletionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected completion: {date}'**
+  String expectedCompletionDate(Object date);
+
+  /// No description provided for @pagesToReadToday.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pages to read today'**
+  String pagesToReadToday(Object count);
 }
 
 class _AppLocalizationsDelegate

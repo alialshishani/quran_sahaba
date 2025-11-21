@@ -41,5 +41,8 @@
   "theme": "السمة",
   "khetmehPlan5Title": "تجوال حر",
   "khetmehPlan5Subtitle": "اقرأ بالسرعة التي تناسبك",
-  "khetmehPlan5Range": "لا توجد خطة محددة ، فقط اقرأ."
+  "khetmehPlan5Range": "لا توجد خطة محددة ، فقط اقرأ.",
+  "pagesRemaining": "{count} صفحات متبقية",
+  "expectedCompletionDate": "التاريخ المتوقع للانتهاء: {date}",
+  "pagesToReadToday": "{count} صفحات للقراءة اليوم"
 }

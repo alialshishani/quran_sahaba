@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:quran_sahaba/l10n/app_localizations.dart';
 
 import '../../models/quran_data.dart';
 
 class KhetmehTab extends StatelessWidget {
-  const KhetmehTab(
-      {super.key, required this.onPlanSelected, required this.khetmehProgress});
+  const KhetmehTab({
+    super.key,
+    required this.onPlanSelected,
+    required this.khetmehProgress,
+    required this.khetmehDailyReadingCounts,
+  });
   final ValueChanged<String> onPlanSelected;
   final Map<String, int> khetmehProgress;
+  final Map<String, Map<String, int>> khetmehDailyReadingCounts;
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +23,38 @@ class KhetmehTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
         final plan = plans[index];
-        final currentPage = khetmehProgress[plan.title] ?? 0;
+        final currentPage = khetmehProgress[plan.title] ?? plan.startPage;
         final progress = (currentPage - plan.startPage) /
             (plan.endPage - plan.startPage);
+        final remainingTotalPages = plan.endPage - currentPage;
+
+        // Calculate pages per day for this plan
+        final pagesPerDay = plan.durationInDays > 0
+            ? (plan.endPage - plan.startPage + 1) / plan.durationInDays
+            : (plan.endPage - plan.startPage + 1); // For free roam or undefined duration
+
+        // Get today's date key
+        final todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+        // Get pages read today for this specific khetmeh
+        final pagesReadTodayForThisKhetmeh =
+            khetmehDailyReadingCounts[plan.title]?[todayKey] ?? 0;
+
+        // Calculate remaining pages for today
+        int remainingPagesToday = 0;
+        if (plan.durationInDays > 0) { // For timed khetmehs
+          remainingPagesToday = (pagesPerDay - pagesReadTodayForThisKhetmeh).ceil();
+          if (remainingPagesToday < 0) remainingPagesToday = 0;
+        }
+
+
+        // Calculate expected completion date
+        DateTime? expectedCompletionDate;
+        if (plan.durationInDays > 0 && remainingTotalPages > 0) {
+          final daysRemaining = (remainingTotalPages / pagesPerDay).ceil();
+          expectedCompletionDate = DateTime.now().add(Duration(days: daysRemaining));
+        }
+
         return Card(
           child: GestureDetector(
             onTap: () => onPlanSelected(plan.title),
@@ -30,12 +65,18 @@ class KhetmehTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(plan.subtitle),
+                  Text('Page $currentPage of ${plan.endPage}'), // Added current page / total pages
                   const SizedBox(height: 4),
                   LinearProgressIndicator(
-                    value: progress.isNaN || progress.isInfinite
+                    value: progress.isNaN || progress.isInfinite || progress.isNegative
                         ? 0
                         : progress,
                   ),
+                  if (remainingPagesToday > 0 && plan.durationInDays > 0)
+                    Text(l.pagesToReadToday(remainingPagesToday)),
+                  if (expectedCompletionDate != null && plan.durationInDays > 0)
+                    Text(l.expectedCompletionDate(
+                        DateFormat.yMMMd().format(expectedCompletionDate))),
                 ],
               ),
             ),
@@ -46,4 +87,6 @@ class KhetmehTab extends StatelessWidget {
       itemCount: plans.length,
     );
   }
+
+  String get _todayKey => DateFormat('yyyy-MM-dd').format(DateTime.now());
 }

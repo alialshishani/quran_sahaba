@@ -144,4 +144,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get khetmehPlan5Range => 'لا توجد خطة محددة ، فقط اقرأ.';
+
+  @override
+  String pagesRemaining(Object count) {
+    return '$count صفحات متبقية';
+  }
+
+  @override
+  String expectedCompletionDate(Object date) {
+    return 'التاريخ المتوقع للانتهاء: $date';
+  }
+
+  @override
+  String pagesToReadToday(Object count) {
+    return '$count صفحات للقراءة اليوم';
+  }
 }

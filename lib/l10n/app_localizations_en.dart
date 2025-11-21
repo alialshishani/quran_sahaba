@@ -144,4 +144,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get khetmehPlan5Range => 'No specific plan, just read.';
+
+  @override
+  String pagesRemaining(Object count) {
+    return '$count pages remaining';
+  }
+
+  @override
+  String expectedCompletionDate(Object date) {
+    return 'Expected completion: $date';
+  }
+
+  @override
+  String pagesToReadToday(Object count) {
+    return '$count pages to read today';
+  }
 }
