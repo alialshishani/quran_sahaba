@@ -41,6 +41,5 @@
   "aboutText": "Swipe through the Quran PNG pages using the Reader tab.\nUse the arrows or tabs at the bottom to navigate.",
   "surah": "Surah",
   "language": "Language",
-  "theme": "Theme",
-  "showHideChrome": "Show/Hide Chrome"
+  "theme": "Theme"
 }

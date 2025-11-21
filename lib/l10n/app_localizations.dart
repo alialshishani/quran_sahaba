@@ -337,12 +337,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Theme'**
   String get theme;
-
-  /// No description provided for @showHideChrome.
-  ///
-  /// In en, this message translates to:
-  /// **'Show/Hide Chrome'**
-  String get showHideChrome;
 }
 
 class _AppLocalizationsDelegate

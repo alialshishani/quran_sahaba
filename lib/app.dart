@@ -87,6 +87,8 @@ class _MyAppState extends State<MyApp> {
               : const Locale('en');
           _updateLocale(nextLocale);
         },
+        locale: _locale,
+        onLocaleChanged: _updateLocale,
       ),
     );
   }

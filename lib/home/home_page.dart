@@ -16,11 +16,15 @@ class MyHomePage extends StatefulWidget {
     required this.isDarkMode,
     required this.onToggleTheme,
     required this.onToggleLocale,
+    required this.locale,
+    required this.onLocaleChanged,
   });
 
   final bool isDarkMode;
   final VoidCallback onToggleTheme;
   final VoidCallback onToggleLocale;
+  final Locale locale;
+  final ValueChanged<Locale> onLocaleChanged;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -182,9 +186,9 @@ class _MyHomePageState extends State<MyHomePage> {
           _ => SettingsTab(
               onToggleLocale: widget.onToggleLocale,
               onToggleTheme: widget.onToggleTheme,
-              onToggleChrome: _toggleChrome,
               isDarkMode: widget.isDarkMode,
-              isBottomBarVisible: _isBottomBarVisible,
+              locale: widget.locale,
+              onLocaleChanged: widget.onLocaleChanged,
             ),
         },
       ),

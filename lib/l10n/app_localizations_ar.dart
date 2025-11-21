@@ -135,7 +135,4 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get theme => 'السمة';
-
-  @override
-  String get showHideChrome => 'إظهار/إخفاء الشريط';
 }

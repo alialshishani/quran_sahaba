@@ -6,16 +6,16 @@ class SettingsTab extends StatelessWidget {
     super.key,
     required this.onToggleLocale,
     required this.onToggleTheme,
-    required this.onToggleChrome,
     required this.isDarkMode,
-    required this.isBottomBarVisible,
+    required this.locale,
+    required this.onLocaleChanged,
   });
 
   final VoidCallback onToggleLocale;
   final VoidCallback onToggleTheme;
-  final VoidCallback onToggleChrome;
   final bool isDarkMode;
-  final bool isBottomBarVisible;
+  final Locale locale;
+  final ValueChanged<Locale> onLocaleChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -25,19 +25,29 @@ class SettingsTab extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.language),
           title: Text(AppLocalizations.of(context)!.language),
-          onTap: onToggleLocale,
+          trailing: DropdownButton<Locale>(
+            value: locale,
+            items: const [
+              DropdownMenuItem(
+                value: Locale('en'),
+                child: Text('English'),
+              ),
+              DropdownMenuItem(
+                value: Locale('ar'),
+                child: Text('العربية'),
+              ),
+            ],
+            onChanged: (newLocale) {
+              if (newLocale != null) {
+                onLocaleChanged(newLocale);
+              }
+            },
+          ),
         ),
         ListTile(
           leading: Icon(isDarkMode ? Icons.dark_mode : Icons.sunny),
           title: Text(AppLocalizations.of(context)!.theme),
           onTap: onToggleTheme,
-        ),
-        ListTile(
-          leading: Icon(
-            isBottomBarVisible ? Icons.visibility_off : Icons.visibility,
-          ),
-          title: Text(AppLocalizations.of(context)!.showHideChrome),
-          onTap: onToggleChrome,
         ),
       ],
     );
