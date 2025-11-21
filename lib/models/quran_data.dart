@@ -5,11 +5,15 @@ class KhetmehPlan {
   final String title;
   final String subtitle;
   final String rangeDescription;
+  final int startPage;
+  final int endPage;
 
   const KhetmehPlan({
     required this.title,
     required this.subtitle,
     required this.rangeDescription,
+    required this.startPage,
+    required this.endPage,
   });
 }
 
@@ -40,26 +44,36 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       title: l.khetmehPlan1Title,
       subtitle: l.khetmehPlan1Subtitle,
       rangeDescription: l.khetmehPlan1Range,
+      startPage: 1,
+      endPage: 604,
     ),
     KhetmehPlan(
       title: l.khetmehPlan2Title,
       subtitle: l.khetmehPlan2Subtitle,
       rangeDescription: l.khetmehPlan2Range,
+      startPage: 1,
+      endPage: 604,
     ),
     KhetmehPlan(
       title: l.khetmehPlan3Title,
       subtitle: l.khetmehPlan3Subtitle,
       rangeDescription: l.khetmehPlan3Range,
+      startPage: 1,
+      endPage: 604,
     ),
     KhetmehPlan(
       title: l.khetmehPlan4Title,
       subtitle: l.khetmehPlan4Subtitle,
       rangeDescription: l.khetmehPlan4Range,
+      startPage: 1,
+      endPage: 604,
     ),
     KhetmehPlan(
       title: l.khetmehPlan5Title,
       subtitle: l.khetmehPlan5Subtitle,
       rangeDescription: l.khetmehPlan5Range,
+      startPage: 1,
+      endPage: 604,
     ),
   ];
 }

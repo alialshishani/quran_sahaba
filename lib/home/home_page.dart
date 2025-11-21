@@ -181,11 +181,27 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
         centerTitle: true,
         title: showChrome
-            ? Text(
-                _tabIndex == 0
-                    ? ' ${_currentSurahName ?? AppLocalizations.of(context)!.surah}'
-                    : AppLocalizations.of(context)!.khetmeh,
-                style: Theme.of(context).textTheme.headlineMedium,
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    _tabIndex == 0
+                        ? ' ${_currentSurahName ?? AppLocalizations.of(context)!.surah}'
+                        : AppLocalizations.of(context)!.khetmeh,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  if (_tabIndex == 0 && _selectedKhetmeh.isNotEmpty)
+                    Text(
+                      _selectedKhetmeh,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.7),
+                          ),
+                    ),
+                ],
               )
             : const SizedBox.shrink(),
         automaticallyImplyLeading: false,
@@ -195,7 +211,10 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: _tabIndex == 0 ? _toggleChrome : null,
         child: switch (_tabIndex) {
           0 => _buildReaderTab(),
-          1 => KhetmehTab(onPlanSelected: _handlePlanSelected),
+          1 => KhetmehTab(
+              onPlanSelected: _handlePlanSelected,
+              khetmehProgress: _khetmehProgress,
+            ),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,
             selectedJuzNumber: _selectedJuzNumber,
