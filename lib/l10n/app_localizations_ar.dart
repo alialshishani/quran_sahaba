@@ -94,15 +94,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get khetmehPlan3Range => 'إنهاء كل يوم جمعة';
 
   @override
-  String get khetmehPlan4Title => 'تركيز نهاية الأسبوع';
-
-  @override
-  String get khetmehPlan4Subtitle => 'جزء 1-15 السبت ، 16-30 الأحد';
-
-  @override
-  String get khetmehPlan4Range => 'صفحات 1-302 ثم 303-604';
-
-  @override
   String get statsPagesReadToday => 'الصفحات المقروءة اليوم';
 
   @override

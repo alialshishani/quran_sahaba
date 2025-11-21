@@ -260,24 +260,6 @@ abstract class AppLocalizations {
   /// **'Finish every Friday'**
   String get khetmehPlan3Range;
 
-  /// No description provided for @khetmehPlan4Title.
-  ///
-  /// In en, this message translates to:
-  /// **'Weekend Focus'**
-  String get khetmehPlan4Title;
-
-  /// No description provided for @khetmehPlan4Subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Juz 1-15 Sat, 16-30 Sun'**
-  String get khetmehPlan4Subtitle;
-
-  /// No description provided for @khetmehPlan4Range.
-  ///
-  /// In en, this message translates to:
-  /// **'Pages 1-302 then 303-604'**
-  String get khetmehPlan4Range;
-
   /// No description provided for @statsPagesReadToday.
   ///
   /// In en, this message translates to:

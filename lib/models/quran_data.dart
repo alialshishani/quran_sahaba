@@ -72,15 +72,6 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       durationInDays: 7,
     ),
     KhetmehPlan(
-      id: 'plan4',
-      title: l.khetmehPlan4Title,
-      subtitle: l.khetmehPlan4Subtitle,
-      rangeDescription: l.khetmehPlan4Range,
-      startPage: 1,
-      endPage: 604,
-      durationInDays: 2,
-    ),
-    KhetmehPlan(
       id: 'plan5',
       title: l.khetmehPlan5Title,
       subtitle: l.khetmehPlan5Subtitle,

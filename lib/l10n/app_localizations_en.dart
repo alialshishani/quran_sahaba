@@ -94,15 +94,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get khetmehPlan3Range => 'Finish every Friday';
 
   @override
-  String get khetmehPlan4Title => 'Weekend Focus';
-
-  @override
-  String get khetmehPlan4Subtitle => 'Juz 1-15 Sat, 16-30 Sun';
-
-  @override
-  String get khetmehPlan4Range => 'Pages 1-302 then 303-604';
-
-  @override
   String get statsPagesReadToday => 'Pages read today';
 
   @override
