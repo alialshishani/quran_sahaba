@@ -153,6 +153,10 @@ class _MyHomePageState extends State<MyHomePage> {
         _currentPage = _khetmehProgress[_selectedKhetmehId] ?? 1;
         _jumpToPageImmediately(_currentPage);
       });
+    } else {
+      setState(() {
+        _selectedKhetmehId = 'plan5';
+      });
     }
   }
 
