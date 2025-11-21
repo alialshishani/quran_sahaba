@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const int _totalPages = 604;
   static const String _khetmehProgressKey = 'khetmeh_progress';
   static const String _selectedKhetmehKey = 'selected_khetmeh';
+  static const String _khetmehCompletionCountsKey = 'khetmeh_completion_counts';
   static const String _statsStorageKey = 'reading_stats_v2'; // Updated key
   late final PageController _pageController;
   final TextEditingController _pageJumpController = TextEditingController();
@@ -45,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isBottomBarVisible = true;
   Map<String, Map<String, int>> _khetmehDailyReadingCounts = {}; // New data structure
   Map<String, int> _khetmehProgress = {};
+  Map<String, int> _khetmehCompletionCounts = {};
   String _selectedKhetmeh = '';
 
   @override
@@ -55,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _loadKhetmehProgress();
     _loadSelectedKhetmeh();
     _loadReadingStats();
+    _loadKhetmehCompletionCounts();
   }
 
   @override
@@ -67,6 +70,22 @@ class _MyHomePageState extends State<MyHomePage> {
   String _pageAssetPath(int page) => 'Quran-PNG-master/$page.jpg';
 
   void _goToPage(int page) {
+    if (_selectedKhetmeh.isNotEmpty && page > _totalPages) {
+      final currentKhetmeh = getKhetmehPlans(
+              AppLocalizations.of(context)!)
+          .firstWhere((plan) => plan.title == _selectedKhetmeh);
+      if (currentKhetmeh.durationInDays > 0) {
+        setState(() {
+          _khetmehCompletionCounts[_selectedKhetmeh] =
+              (_khetmehCompletionCounts[_selectedKhetmeh] ?? 0) + 1;
+          _currentPage = currentKhetmeh.startPage;
+        });
+        _persistKhetmehCompletionCounts();
+        _jumpToPageImmediately(_currentPage);
+        return;
+      }
+    }
+
     final targetPage = page.clamp(1, _totalPages);
     if (_currentPage != targetPage) {
       setState(() {
@@ -104,6 +123,25 @@ class _MyHomePageState extends State<MyHomePage> {
     final prefs = await SharedPreferences.getInstance();
     _khetmehProgress[_selectedKhetmeh] = _currentPage;
     await prefs.setString(_khetmehProgressKey, jsonEncode(_khetmehProgress));
+  }
+
+  Future<void> _loadKhetmehCompletionCounts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final counts = prefs.getString(_khetmehCompletionCountsKey);
+    if (counts != null) {
+      setState(() {
+        _khetmehCompletionCounts =
+            (jsonDecode(counts) as Map<String, dynamic>).map(
+          (key, value) => MapEntry(key, (value as num).toInt()),
+        );
+      });
+    }
+  }
+
+  Future<void> _persistKhetmehCompletionCounts() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        _khetmehCompletionCountsKey, jsonEncode(_khetmehCompletionCounts));
   }
 
   Future<void> _loadSelectedKhetmeh() async {
@@ -223,6 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onPlanSelected: _handlePlanSelected,
               khetmehProgress: _khetmehProgress,
               khetmehDailyReadingCounts: _khetmehDailyReadingCounts,
+              khetmehCompletionCounts: _khetmehCompletionCounts,
             ),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,

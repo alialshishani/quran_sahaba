@@ -44,5 +44,6 @@
   "khetmehPlan5Range": "لا توجد خطة محددة ، فقط اقرأ.",
   "pagesRemaining": "{count} صفحات متبقية",
   "expectedCompletionDate": "التاريخ المتوقع للانتهاء: {date}",
-  "pagesToReadToday": "{count} صفحات للقراءة اليوم"
+  "pagesToReadToday": "{count} صفحات للقراءة اليوم",
+  "khetmehCompletions": "{count} إكمالات"
 }

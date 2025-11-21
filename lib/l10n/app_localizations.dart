@@ -373,6 +373,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} pages to read today'**
   String pagesToReadToday(Object count);
+
+  /// No description provided for @khetmehCompletions.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} completions'**
+  String khetmehCompletions(Object count);
 }
 
 class _AppLocalizationsDelegate

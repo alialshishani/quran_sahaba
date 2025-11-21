@@ -5,15 +5,16 @@ import 'package:quran_sahaba/l10n/app_localizations.dart';
 import '../../models/quran_data.dart';
 
 class KhetmehTab extends StatelessWidget {
-  const KhetmehTab({
-    super.key,
-    required this.onPlanSelected,
-    required this.khetmehProgress,
-    required this.khetmehDailyReadingCounts,
-  });
+  const KhetmehTab(
+      {super.key,
+      required this.onPlanSelected,
+      required this.khetmehProgress,
+      required this.khetmehDailyReadingCounts,
+      required this.khetmehCompletionCounts});
   final ValueChanged<String> onPlanSelected;
   final Map<String, int> khetmehProgress;
   final Map<String, Map<String, int>> khetmehDailyReadingCounts;
+  final Map<String, int> khetmehCompletionCounts;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +28,7 @@ class KhetmehTab extends StatelessWidget {
         final progress = (currentPage - plan.startPage) /
             (plan.endPage - plan.startPage);
         final remainingTotalPages = plan.endPage - currentPage;
+        final completions = khetmehCompletionCounts[plan.title] ?? 0;
 
         // Calculate pages per day for this plan
         final pagesPerDay = plan.durationInDays > 0
@@ -77,6 +79,8 @@ class KhetmehTab extends StatelessWidget {
                   if (expectedCompletionDate != null && plan.durationInDays > 0)
                     Text(l.expectedCompletionDate(
                         DateFormat.yMMMd().format(expectedCompletionDate))),
+                  if (completions > 0)
+                    Text(l.khetmehCompletions(completions)),
                 ],
               ),
             ),

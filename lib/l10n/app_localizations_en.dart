@@ -159,4 +159,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String pagesToReadToday(Object count) {
     return '$count pages to read today';
   }
+
+  @override
+  String khetmehCompletions(Object count) {
+    return '$count completions';
+  }
 }
