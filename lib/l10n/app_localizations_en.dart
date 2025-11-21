@@ -135,4 +135,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get theme => 'Theme';
+
+  @override
+  String get khetmehPlan5Title => 'Free Roam';
+
+  @override
+  String get khetmehPlan5Subtitle => 'Read at your own pace';
+
+  @override
+  String get khetmehPlan5Range => 'No specific plan, just read.';
 }

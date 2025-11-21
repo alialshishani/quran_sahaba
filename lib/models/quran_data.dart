@@ -56,6 +56,11 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       subtitle: l.khetmehPlan4Subtitle,
       rangeDescription: l.khetmehPlan4Range,
     ),
+    KhetmehPlan(
+      title: l.khetmehPlan5Title,
+      subtitle: l.khetmehPlan5Subtitle,
+      rangeDescription: l.khetmehPlan5Range,
+    ),
   ];
 }
 

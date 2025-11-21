@@ -135,4 +135,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get theme => 'السمة';
+
+  @override
+  String get khetmehPlan5Title => 'تجوال حر';
+
+  @override
+  String get khetmehPlan5Subtitle => 'اقرأ بالسرعة التي تناسبك';
+
+  @override
+  String get khetmehPlan5Range => 'لا توجد خطة محددة ، فقط اقرأ.';
 }

@@ -337,6 +337,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Theme'**
   String get theme;
+
+  /// No description provided for @khetmehPlan5Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Roam'**
+  String get khetmehPlan5Title;
+
+  /// No description provided for @khetmehPlan5Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read at your own pace'**
+  String get khetmehPlan5Subtitle;
+
+  /// No description provided for @khetmehPlan5Range.
+  ///
+  /// In en, this message translates to:
+  /// **'No specific plan, just read.'**
+  String get khetmehPlan5Range;
 }
 
 class _AppLocalizationsDelegate
