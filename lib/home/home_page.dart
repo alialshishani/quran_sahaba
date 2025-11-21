@@ -153,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 _tabIndex == 0
                     ? ' ${_currentSurahName ?? AppLocalizations.of(context)!.surah}'
                     : AppLocalizations.of(context)!.khetmeh,
+                style: Theme.of(context).textTheme.headlineMedium,
               )
             : const SizedBox.shrink(),
         automaticallyImplyLeading: false,
