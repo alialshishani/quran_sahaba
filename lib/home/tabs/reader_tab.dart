@@ -31,7 +31,7 @@ class ReaderTab extends StatelessWidget {
         Positioned.fill(
           child: PageView.builder(
             controller: pageController,
-            reverse: false,
+            reverse: true,
             itemCount: totalPages,
             onPageChanged: onPageChanged,
             itemBuilder: (context, index) {
@@ -79,14 +79,14 @@ class ReaderTab extends StatelessWidget {
                     _arrowWithUnderline(
                       context: context,
                       icon: Icons.arrow_back,
-                      onPressed: onPrevious,
+                      onPressed: onNext,
                       showUnderline: currentPage.isEven,
                     ),
                     Text(currentPage.toString()),
                     _arrowWithUnderline(
                       context: context,
                       icon: Icons.arrow_forward,
-                      onPressed: onNext,
+                      onPressed: onPrevious,
                       showUnderline: currentPage.isOdd,
                     ),
                   ],
