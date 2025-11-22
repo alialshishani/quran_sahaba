@@ -36,6 +36,8 @@ class _MyHomePageState extends State<MyHomePage> {
   static const String _selectedKhetmehKey = 'selected_khetmeh_id'; // Changed to id
   static const String _khetmehCompletionCountsKey = 'khetmeh_completion_counts';
   static const String _statsStorageKey = 'reading_stats_v2'; // Updated key
+  static const String _khetmehCompletionHistoryKey = 'khetmeh_completion_history';
+  static const String _khetmehStartDatesKey = 'khetmeh_start_dates';
   late final PageController _pageController;
   final TextEditingController _pageJumpController = TextEditingController();
   int _currentPage = 1;
@@ -47,6 +49,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String, Map<String, int>> _khetmehDailyReadingCounts = {}; // New data structure
   Map<String, int> _khetmehProgress = {};
   Map<String, int> _khetmehCompletionCounts = {};
+  Map<String, List<KhetmehCompletion>> _khetmehCompletionHistory = {};
+  Map<String, DateTime> _khetmehStartDates = {};
   String _selectedKhetmehId = ''; // Changed to id
   late AppLocalizations _l;
 
@@ -62,6 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _loadSelectedKhetmeh();
     _loadReadingStats();
     _loadKhetmehCompletionCounts();
+    _loadKhetmehCompletionHistory();
+    _loadKhetmehStartDates();
   }
 
   @override
@@ -109,12 +115,45 @@ class _MyHomePageState extends State<MyHomePage> {
   void _completeKhetmeh() {
     final currentKhetmeh =
         getKhetmehPlans(_l).firstWhere((plan) => plan.id == _selectedKhetmehId);
+
+    // Calculate completion record
+    final completionDate = DateTime.now();
+    final startDate = _khetmehStartDates[_selectedKhetmehId] ?? completionDate;
+    final daysToComplete = completionDate.difference(startDate).inDays + 1;
+
+    final completion = KhetmehCompletion(
+      khetmehId: _selectedKhetmehId,
+      startDate: startDate,
+      completionDate: completionDate,
+      daysToComplete: daysToComplete,
+    );
+
     setState(() {
       _khetmehCompletionCounts[_selectedKhetmehId] =
           (_khetmehCompletionCounts[_selectedKhetmehId] ?? 0) + 1;
+
+      // Add to completion history
+      if (!_khetmehCompletionHistory.containsKey(_selectedKhetmehId)) {
+        _khetmehCompletionHistory[_selectedKhetmehId] = [];
+      }
+      _khetmehCompletionHistory[_selectedKhetmehId]!.add(completion);
+
+      // Reset start date for next completion
+      _khetmehStartDates[_selectedKhetmehId] = DateTime.now();
+
       _currentPage = currentKhetmeh.startPage;
+
+      // Update the progress map to reflect the new page
+      _khetmehProgress[_selectedKhetmehId] = _currentPage;
+
+      // Update the text controller
+      _pageJumpController.text = _currentPage.toString();
     });
+
     _persistKhetmehCompletionCounts();
+    _persistKhetmehCompletionHistory();
+    _persistKhetmehStartDates();
+    _persistKhetmehProgress(); // Persist the updated progress
     _jumpToPageImmediately(_currentPage);
   }
 
@@ -201,6 +240,66 @@ class _MyHomePageState extends State<MyHomePage> {
         _statsStorageKey, jsonEncode(_khetmehDailyReadingCounts));
   }
 
+  Future<void> _loadKhetmehCompletionHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_khetmehCompletionHistoryKey);
+    if (data == null) return;
+
+    final decoded = jsonDecode(data) as Map<String, dynamic>;
+    final Map<String, List<KhetmehCompletion>> tempMap = {};
+
+    decoded.forEach((khetmehId, completionsList) {
+      if (completionsList is List) {
+        tempMap[khetmehId] = completionsList
+            .map((item) => KhetmehCompletion.fromJson(item as Map<String, dynamic>))
+            .toList();
+      }
+    });
+
+    setState(() {
+      _khetmehCompletionHistory = tempMap;
+    });
+  }
+
+  Future<void> _persistKhetmehCompletionHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> toEncode = {};
+
+    _khetmehCompletionHistory.forEach((khetmehId, completions) {
+      toEncode[khetmehId] = completions.map((c) => c.toJson()).toList();
+    });
+
+    await prefs.setString(_khetmehCompletionHistoryKey, jsonEncode(toEncode));
+  }
+
+  Future<void> _loadKhetmehStartDates() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_khetmehStartDatesKey);
+    if (data == null) return;
+
+    final decoded = jsonDecode(data) as Map<String, dynamic>;
+    final Map<String, DateTime> tempMap = {};
+
+    decoded.forEach((khetmehId, dateString) {
+      tempMap[khetmehId] = DateTime.parse(dateString as String);
+    });
+
+    setState(() {
+      _khetmehStartDates = tempMap;
+    });
+  }
+
+  Future<void> _persistKhetmehStartDates() async {
+    final prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> toEncode = {};
+
+    _khetmehStartDates.forEach((khetmehId, date) {
+      toEncode[khetmehId] = date.toIso8601String();
+    });
+
+    await prefs.setString(_khetmehStartDatesKey, jsonEncode(toEncode));
+  }
+
   void _toggleChrome() {
     setState(() {
       _isBottomBarVisible = !_isBottomBarVisible;
@@ -236,6 +335,13 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedKhetmehId = planId;
       _currentPage = _khetmehProgress[planId] ?? 1;
+
+      // Set start date if not already set
+      if (!_khetmehStartDates.containsKey(planId)) {
+        _khetmehStartDates[planId] = DateTime.now();
+        _persistKhetmehStartDates();
+      }
+
       _jumpToPageImmediately(_currentPage);
       _tabIndex = 0;
     });
@@ -297,6 +403,7 @@ class _MyHomePageState extends State<MyHomePage> {
               khetmehProgress: _khetmehProgress,
               khetmehDailyReadingCounts: _khetmehDailyReadingCounts,
               khetmehCompletionCounts: _khetmehCompletionCounts,
+              khetmehCompletionHistory: _khetmehCompletionHistory,
             ),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,

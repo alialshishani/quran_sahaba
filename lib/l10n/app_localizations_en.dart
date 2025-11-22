@@ -128,6 +128,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get theme => 'Theme';
 
   @override
+  String get khetmehPlan4Title => 'Sahaba Khetmeh';
+
+  @override
+  String get khetmehPlan4Subtitle => '7-day surah-based cycle';
+
+  @override
+  String get khetmehPlan4Range => 'Special daily surahs';
+
+  @override
   String get khetmehPlan5Title => 'Free Roam';
 
   @override
@@ -154,5 +163,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String khetmehCompletions(Object count) {
     return '$count completions';
+  }
+
+  @override
+  String sahabaKhetmehDay(Object day, Object surah) {
+    return 'Day $day: $surah';
   }
 }

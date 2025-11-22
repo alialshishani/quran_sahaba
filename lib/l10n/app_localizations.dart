@@ -320,6 +320,24 @@ abstract class AppLocalizations {
   /// **'Theme'**
   String get theme;
 
+  /// No description provided for @khetmehPlan4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sahaba Khetmeh'**
+  String get khetmehPlan4Title;
+
+  /// No description provided for @khetmehPlan4Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'7-day surah-based cycle'**
+  String get khetmehPlan4Subtitle;
+
+  /// No description provided for @khetmehPlan4Range.
+  ///
+  /// In en, this message translates to:
+  /// **'Special daily surahs'**
+  String get khetmehPlan4Range;
+
   /// No description provided for @khetmehPlan5Title.
   ///
   /// In en, this message translates to:
@@ -361,6 +379,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} completions'**
   String khetmehCompletions(Object count);
+
+  /// No description provided for @sahabaKhetmehDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}: {surah}'**
+  String sahabaKhetmehDay(Object day, Object surah);
 }
 
 class _AppLocalizationsDelegate

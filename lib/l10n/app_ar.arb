@@ -36,11 +36,15 @@
   "surah": "سورة",
   "language": "اللغة",
   "theme": "السمة",
+  "khetmehPlan4Title": "ختمة الصحابة",
+  "khetmehPlan4Subtitle": "دورة 7 أيام على أساس السور",
+  "khetmehPlan4Range": "سور يومية خاصة",
   "khetmehPlan5Title": "تجوال حر",
   "khetmehPlan5Subtitle": "اقرأ بالسرعة التي تناسبك",
   "khetmehPlan5Range": "لا توجد خطة محددة ، فقط اقرأ.",
   "pagesRemaining": "{count} صفحات متبقية",
   "expectedCompletionDate": "التاريخ المتوقع للانتهاء: {date}",
   "pagesToReadToday": "{count} صفحات للقراءة اليوم",
-  "khetmehCompletions": "{count} إكمالات"
+  "khetmehCompletions": "{count} إكمالات",
+  "sahabaKhetmehDay": "اليوم {day}: {surah}"
 }

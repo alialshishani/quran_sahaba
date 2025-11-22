@@ -21,6 +21,38 @@ class KhetmehPlan {
   });
 }
 
+class KhetmehCompletion {
+  final String khetmehId;
+  final DateTime startDate;
+  final DateTime completionDate;
+  final int daysToComplete;
+
+  const KhetmehCompletion({
+    required this.khetmehId,
+    required this.startDate,
+    required this.completionDate,
+    required this.daysToComplete,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'khetmehId': khetmehId,
+      'startDate': startDate.toIso8601String(),
+      'completionDate': completionDate.toIso8601String(),
+      'daysToComplete': daysToComplete,
+    };
+  }
+
+  factory KhetmehCompletion.fromJson(Map<String, dynamic> json) {
+    return KhetmehCompletion(
+      khetmehId: json['khetmehId'] as String,
+      startDate: DateTime.parse(json['startDate'] as String),
+      completionDate: DateTime.parse(json['completionDate'] as String),
+      daysToComplete: (json['daysToComplete'] as num).toInt(),
+    );
+  }
+}
+
 class SurahInfo {
   final int number;
   final String nameEn;
@@ -72,6 +104,15 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       durationInDays: 7,
     ),
     KhetmehPlan(
+      id: 'plan4',
+      title: l.khetmehPlan4Title,
+      subtitle: l.khetmehPlan4Subtitle,
+      rangeDescription: l.khetmehPlan4Range,
+      startPage: 1,
+      endPage: 604,
+      durationInDays: 7,
+    ),
+    KhetmehPlan(
       id: 'plan5',
       title: l.khetmehPlan5Title,
       subtitle: l.khetmehPlan5Subtitle,
@@ -81,6 +122,29 @@ List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
       durationInDays: 0,
     ),
   ];
+}
+
+// Sahaba Khetmeh: 7-day cycle based on specific surahs
+// Day 1: Al-Fatiha (1), Day 2: Al-Ma'idah (5), Day 3: Yunus (10),
+// Day 4: Al-Isra (17), Day 5: Ash-Shu'ara (26), Day 6: As-Saffat (37), Day 7: Qaf (50)
+const List<int> sahabaKhetmehSurahs = [1, 5, 10, 17, 26, 37, 50];
+
+int getSahabaKhetmehCurrentDaySurah(DateTime startDate) {
+  final daysSinceStart = DateTime.now().difference(startDate).inDays;
+  final cycleDay = daysSinceStart % 7;
+  return sahabaKhetmehSurahs[cycleDay];
+}
+
+int getSahabaKhetmehNextSurahPage(DateTime startDate) {
+  final currentDaySurah = getSahabaKhetmehCurrentDaySurah(startDate);
+
+  // Find the next surah in the cycle
+  final currentCycleIndex = sahabaKhetmehSurahs.indexOf(currentDaySurah);
+  final nextCycleIndex = (currentCycleIndex + 1) % 7;
+  final nextSurah = sahabaKhetmehSurahs[nextCycleIndex];
+  final nextSurahInfo = surahInfos.firstWhere((s) => s.number == nextSurah);
+
+  return nextSurahInfo.page;
 }
 
 final List<SurahInfo> surahInfos = [
