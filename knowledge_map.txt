@@ -1,0 +1,87 @@
+# In-Depth Knowledge Map: Quran Sahaba Flutter Project
+
+## 1. Project Overview
+
+This is a Quran reader application built with Flutter. The app's primary function is to display pages of the Quran as images, allowing users to read through the holy book. It also includes features to help users track their reading progress through "Khetmeh" (reading plans), navigate to specific Surahs or Juzs, and view reading statistics. The app supports both English and Arabic languages and offers a dark mode theme.
+
+## 2. Architecture and Core Components
+
+The application follows a relatively simple architecture based on Flutter's `StatefulWidget` for managing state. The main screen uses a `BottomNavigationBar` to switch between different sections of the app.
+
+### `lib/main.dart`
+
+This is the entry point of the application. It contains the `main` function, which is the first code to be executed. Its sole purpose is to run the `MyApp` widget, which is the root of the application.
+
+```dart
+void main() {
+  runApp(const MyApp());
+}
+```
+
+### `lib/app.dart`
+
+This file defines the `MyApp` widget, which is the root of the application's widget tree. `MyApp` is a `StatefulWidget` responsible for:
+
+*   **Theme Management**: It manages the application's theme (light or dark mode) and persists the user's choice using `shared_preferences`.
+*   **Locale Management**: It manages the application's language (English or Arabic) and persists the user's choice using `shared_preferences`.
+*   **MaterialApp**: It sets up the `MaterialApp` widget, defining the app's title, theme data, localization delegates, and the home page.
+
+### `lib/home/home_page.dart`
+
+This is the most critical file in the application, defining the main screen `MyHomePage`. It's a `StatefulWidget` that acts as the central hub for the app's UI and state management.
+
+*   **State Management**: `_MyHomePageState` manages the currently selected tab, the current page of the Quran being viewed, reading progress, and all user interactions.
+*   **Bottom Navigation**: It implements a `BottomNavigationBar` with five tabs: Reader, Khetmeh, Navigate, Statistics, and Settings.
+*   **Tab Views**: A `switch` statement in the `build` method renders the appropriate widget for the currently selected tab.
+
+### `lib/home/tabs/`
+
+This directory contains the individual widgets for each of the five tabs in the `BottomNavigationBar`:
+
+*   `reader_tab.dart`: Displays the Quran pages using a `PageView`. It handles page swiping and navigation.
+*   `khetmeh_tab.dart`: Allows users to select and manage their reading plans ("Khetmeh"). It displays progress for each plan.
+*   `navigate_tab.dart`: Provides tools for users to navigate to a specific Surah, Juz, or page number.
+*   `stats_tab.dart`: Shows the user's reading statistics, such as daily and weekly averages.
+*   `settings_tab.dart`: Contains options to toggle the theme (dark/light mode) and language (English/Arabic).
+
+## 3. Data Management
+
+### `lib/models/quran_data.dart`
+
+This file contains the hardcoded data for the application. It defines several data classes and lists:
+
+*   `KhetmehPlan`: A class representing a reading plan, with properties like title, duration, and page range.
+*   `SurahInfo`: A class containing information about each Surah, including its name (in English and Arabic) and starting page number.
+*   `JuzInfo`: A class representing a Juz, with its number and starting page.
+*   `getKhetmehPlans`, `surahInfos`, `juzInfos`: Lists that hold the application's data for reading plans, Surahs, and Juzs.
+
+### `shared_preferences`
+
+The app uses the `shared_preferences` package for data persistence. It stores the following user data:
+
+*   **Theme Preference**: The selected theme (light or dark mode) is saved and loaded when the app starts.
+*   **Locale Preference**: The selected language (English or Arabic) is saved.
+*   **Khetmeh Progress**: The user's current page for each Khetmeh plan is stored to resume reading.
+*   **Reading Statistics**: Data on reading activity is saved to calculate statistics.
+
+## 4. Dependencies
+
+The project's dependencies are defined in the `pubspec.yaml` file:
+
+*   `flutter`: The core Flutter framework.
+*   `cupertino_icons`: For iOS-style icons.
+*   `shared_preferences`: For persistent storage.
+*   `flutter_localizations` and `intl`: For internationalization and localization.
+
+## 5. Assets
+
+The application's assets are also declared in `pubspec.yaml`:
+
+*   `Quran-PNG-master/`: This directory contains the images of the Quran pages, from 1.jpg to 604.jpg. These images are the core content of the app.
+
+## 6. Localization
+
+The app supports English and Arabic. This is configured using:
+
+*   `l10n.yaml`: This file configures the Flutter localization tool.
+*   `lib/l10n/`: This directory contains `.arb` files (`app_en.arb` and `app_ar.arb`) which hold the key-value pairs for the translated strings in the app. The `AppLocalizations` class is auto-generated from these files to provide type-safe access to the localized strings.

@@ -32,10 +32,11 @@ class ReaderTab extends StatelessWidget {
           child: PageView.builder(
             controller: pageController,
             reverse: true,
-            itemCount: totalPages,
             onPageChanged: onPageChanged,
             itemBuilder: (context, index) {
-              final pageNumber = index + 1;
+              // Calculate actual page number with wrapping
+              final actualIndex = index % totalPages;
+              final pageNumber = actualIndex + 1;
               return InteractiveViewer(
                 child: Center(
                   child: invertColors

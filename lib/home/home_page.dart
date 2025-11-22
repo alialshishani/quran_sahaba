@@ -48,11 +48,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String, int> _khetmehProgress = {};
   Map<String, int> _khetmehCompletionCounts = {};
   String _selectedKhetmehId = ''; // Changed to id
+  late AppLocalizations _l;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: _currentPage - 1);
+    // Use a very large initial page to allow wrapping in both directions
+    // We position ourselves at a multiple of totalPages to enable infinite scrolling
+    final initialIndex = (_currentPage - 1) + (_totalPages * 1000);
+    _pageController = PageController(initialPage: initialIndex);
     _pageJumpController.text = _currentPage.toString();
     _loadKhetmehProgress();
     _loadSelectedKhetmeh();
@@ -71,19 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _goToPage(int page) {
     if (_selectedKhetmehId.isNotEmpty && page > _totalPages) {
-      final currentKhetmeh = getKhetmehPlans(
-              AppLocalizations.of(context)!)
-          .firstWhere((plan) => plan.id == _selectedKhetmehId);
-      if (currentKhetmeh.durationInDays > 0) {
-        setState(() {
-          _khetmehCompletionCounts[_selectedKhetmehId] =
-              (_khetmehCompletionCounts[_selectedKhetmehId] ?? 0) + 1;
-          _currentPage = currentKhetmeh.startPage;
-        });
-        _persistKhetmehCompletionCounts();
-        _jumpToPageImmediately(_currentPage);
-        return;
-      }
+      _completeKhetmeh();
+      return;
     }
 
     final targetPage = page.clamp(1, _totalPages);
@@ -95,8 +88,14 @@ class _MyHomePageState extends State<MyHomePage> {
       _persistKhetmehProgress();
     }
     if (_pageController.hasClients) {
+      // Calculate the target index in the infinite scroll
+      // We want to maintain the current "cycle" to ensure smooth animation
+      final currentIndex = _pageController.page?.round() ?? 0;
+      final currentCycle = currentIndex ~/ _totalPages;
+      final targetIndex = (currentCycle * _totalPages) + (targetPage - 1);
+
       _pageController.animateToPage(
-        targetPage - 1,
+        targetIndex,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -105,6 +104,18 @@ class _MyHomePageState extends State<MyHomePage> {
       _pendingPage = targetPage;
       _schedulePendingPageApplication();
     }
+  }
+
+  void _completeKhetmeh() {
+    final currentKhetmeh =
+        getKhetmehPlans(_l).firstWhere((plan) => plan.id == _selectedKhetmehId);
+    setState(() {
+      _khetmehCompletionCounts[_selectedKhetmehId] =
+          (_khetmehCompletionCounts[_selectedKhetmehId] ?? 0) + 1;
+      _currentPage = currentKhetmeh.startPage;
+    });
+    _persistKhetmehCompletionCounts();
+    _jumpToPageImmediately(_currentPage);
   }
 
   Future<void> _loadKhetmehProgress() async {
@@ -197,7 +208,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _handlePageChanged(int index) {
-    final updatedPage = index + 1;
+    // Calculate actual page with wrapping
+    final actualIndex = index % _totalPages;
+    final updatedPage = actualIndex + 1;
+
+    // Detect if we wrapped from page 604 to page 1 (moving forward)
+    if (_currentPage == _totalPages && updatedPage == 1 && index > _currentPage - 1) {
+      // User swiped forward from page 604 to page 1
+      if (_selectedKhetmehId.isNotEmpty) {
+        // Complete khetmeh if one is selected
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _completeKhetmeh();
+        });
+        return;
+      }
+    }
+
     setState(() {
       _currentPage = updatedPage;
     });
@@ -218,6 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _l = AppLocalizations.of(context)!;
     final bool showChrome = _tabIndex == 0 ? _isBottomBarVisible : true;
     final selectedKhetmehPlan = _selectedKhetmehId.isNotEmpty
         ? getKhetmehPlans(AppLocalizations.of(context)!)
@@ -373,6 +400,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _applyPendingPage();
       });
     }
+
     return ReaderTab(
       pageController: _pageController,
       totalPages: _totalPages,
@@ -412,7 +440,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _jumpToPageImmediately(int page) {
     if (_pageController.hasClients) {
-      _pageController.jumpToPage(page - 1);
+      // Calculate the target index in the infinite scroll
+      // We want to maintain the current "cycle" when jumping
+      final currentIndex = _pageController.page?.round() ?? (_totalPages * 1000);
+      final currentCycle = currentIndex ~/ _totalPages;
+      final targetIndex = (currentCycle * _totalPages) + (page - 1);
+
+      _pageController.jumpToPage(targetIndex);
       _pendingPage = null;
     } else {
       _pendingPage = page;
@@ -431,7 +465,12 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_pendingPage == null || !_pageController.hasClients) {
       return;
     }
-    _pageController.jumpToPage(_pendingPage! - 1);
+    // Calculate the target index in the infinite scroll
+    final currentIndex = _pageController.page?.round() ?? (_totalPages * 1000);
+    final currentCycle = currentIndex ~/ _totalPages;
+    final targetIndex = (currentCycle * _totalPages) + (_pendingPage! - 1);
+
+    _pageController.jumpToPage(targetIndex);
     _pendingPage = null;
   }
 
