@@ -38,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const String _statsStorageKey = 'reading_stats_v2'; // Updated key
   static const String _khetmehCompletionHistoryKey = 'khetmeh_completion_history';
   static const String _khetmehStartDatesKey = 'khetmeh_start_dates';
+  static const String _khetmehActiveStatusKey = 'khetmeh_active_status';
   late final PageController _pageController;
   final TextEditingController _pageJumpController = TextEditingController();
   int _currentPage = 1;
@@ -51,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String, int> _khetmehCompletionCounts = {};
   Map<String, List<KhetmehCompletion>> _khetmehCompletionHistory = {};
   Map<String, DateTime> _khetmehStartDates = {};
+  Map<String, bool> _khetmehActiveStatus = {};
   String _selectedKhetmehId = ''; // Changed to id
   late AppLocalizations _l;
 
@@ -68,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _loadKhetmehCompletionCounts();
     _loadKhetmehCompletionHistory();
     _loadKhetmehStartDates();
+    _loadKhetmehActiveStatus();
   }
 
   @override
@@ -300,6 +303,28 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setString(_khetmehStartDatesKey, jsonEncode(toEncode));
   }
 
+  Future<void> _loadKhetmehActiveStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_khetmehActiveStatusKey);
+    if (data == null) return;
+
+    final decoded = jsonDecode(data) as Map<String, dynamic>;
+    final Map<String, bool> tempMap = {};
+
+    decoded.forEach((khetmehId, isActive) {
+      tempMap[khetmehId] = isActive as bool;
+    });
+
+    setState(() {
+      _khetmehActiveStatus = tempMap;
+    });
+  }
+
+  Future<void> _persistKhetmehActiveStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_khetmehActiveStatusKey, jsonEncode(_khetmehActiveStatus));
+  }
+
   void _toggleChrome() {
     setState(() {
       _isBottomBarVisible = !_isBottomBarVisible;
@@ -346,6 +371,92 @@ class _MyHomePageState extends State<MyHomePage> {
       _tabIndex = 0;
     });
     _persistSelectedKhetmeh();
+  }
+
+  void _handleStartKhetmeh(String planId) {
+    final plan = getKhetmehPlans(_l).firstWhere((p) => p.id == planId);
+
+    setState(() {
+      _khetmehActiveStatus[planId] = true;
+      _selectedKhetmehId = planId;
+      _currentPage = plan.startPage;
+      _khetmehProgress[planId] = plan.startPage;
+
+      // Set start date when activating
+      _khetmehStartDates[planId] = DateTime.now();
+
+      _jumpToPageImmediately(_currentPage);
+      _tabIndex = 0; // Switch to reader tab
+    });
+
+    _persistKhetmehActiveStatus();
+    _persistKhetmehStartDates();
+    _persistSelectedKhetmeh();
+    _persistKhetmehProgress();
+  }
+
+  void _handleCompleteKhetmeh(String planId) {
+    // Calculate completion record
+    final completionDate = DateTime.now();
+    final startDate = _khetmehStartDates[planId] ?? completionDate;
+    final daysToComplete = completionDate.difference(startDate).inDays + 1;
+
+    final completion = KhetmehCompletion(
+      khetmehId: planId,
+      startDate: startDate,
+      completionDate: completionDate,
+      daysToComplete: daysToComplete,
+    );
+
+    setState(() {
+      // Only deactivate if it's not Free Roam (plan5)
+      if (planId != 'plan5') {
+        _khetmehActiveStatus[planId] = false;
+
+        // If completing the current selected khetmeh, switch to Free Roam
+        if (_selectedKhetmehId == planId) {
+          _selectedKhetmehId = 'plan5'; // Switch to Free Roam
+          _persistSelectedKhetmeh();
+        }
+      } else {
+        // For Free Roam, reset to first page
+        _currentPage = 1;
+        _khetmehProgress[planId] = 1;
+        _pageJumpController.text = '1';
+        _jumpToPageImmediately(1);
+
+        // Reset start date for Free Roam
+        _khetmehStartDates[planId] = DateTime.now();
+        _persistKhetmehStartDates();
+        _persistKhetmehProgress();
+      }
+
+      // Add to completion history
+      _khetmehCompletionCounts[planId] = (_khetmehCompletionCounts[planId] ?? 0) + 1;
+
+      if (!_khetmehCompletionHistory.containsKey(planId)) {
+        _khetmehCompletionHistory[planId] = [];
+      }
+      _khetmehCompletionHistory[planId]!.add(completion);
+    });
+
+    _persistKhetmehActiveStatus();
+    _persistKhetmehCompletionCounts();
+    _persistKhetmehCompletionHistory();
+  }
+
+  void _handleEndKhetmeh(String planId) {
+    // Just deactivate without adding to completion history
+    setState(() {
+      _khetmehActiveStatus[planId] = false;
+
+      // If ending the current selected khetmeh, switch to Free Roam
+      if (_selectedKhetmehId == planId) {
+        _selectedKhetmehId = 'plan5'; // Switch to Free Roam
+        _persistSelectedKhetmeh();
+      }
+    });
+    _persistKhetmehActiveStatus();
   }
 
   @override
@@ -405,6 +516,10 @@ class _MyHomePageState extends State<MyHomePage> {
               khetmehCompletionCounts: _khetmehCompletionCounts,
               khetmehCompletionHistory: _khetmehCompletionHistory,
               khetmehStartDates: _khetmehStartDates,
+              khetmehActiveStatus: _khetmehActiveStatus,
+              onStartKhetmeh: _handleStartKhetmeh,
+              onCompleteKhetmeh: _handleCompleteKhetmeh,
+              onEndKhetmeh: _handleEndKhetmeh,
             ),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,
@@ -578,6 +693,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _recordReadingActivity() {
     if (_selectedKhetmehId.isEmpty) return; // Only record if a khetmeh is selected
+
+    // Check if selected khetmeh is active (Free Roam is always active)
+    final isActive = _selectedKhetmehId == 'plan5' ? true : (_khetmehActiveStatus[_selectedKhetmehId] ?? true);
+    if (!isActive) return; // Don't record stats for inactive khetmehs
+
     final today = _todayKey;
     _khetmehDailyReadingCounts.putIfAbsent(_selectedKhetmehId, () => {});
     final currentKhetmehTodayCounts =

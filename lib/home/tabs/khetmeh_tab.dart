@@ -13,6 +13,10 @@ class KhetmehTab extends StatelessWidget {
     required this.khetmehCompletionCounts,
     required this.khetmehCompletionHistory,
     required this.khetmehStartDates,
+    required this.khetmehActiveStatus,
+    required this.onStartKhetmeh,
+    required this.onCompleteKhetmeh,
+    required this.onEndKhetmeh,
   });
 
   final ValueChanged<String> onPlanSelected;
@@ -21,14 +25,76 @@ class KhetmehTab extends StatelessWidget {
   final Map<String, int> khetmehCompletionCounts;
   final Map<String, List<KhetmehCompletion>> khetmehCompletionHistory;
   final Map<String, DateTime> khetmehStartDates;
+  final Map<String, bool> khetmehActiveStatus;
+  final ValueChanged<String> onStartKhetmeh;
+  final ValueChanged<String> onCompleteKhetmeh;
+  final ValueChanged<String> onEndKhetmeh;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final plans = getKhetmehPlans(l);
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemBuilder: (context, index) {
+
+    // Calculate total completions across all khetmehs
+    int totalCompletions = 0;
+    khetmehCompletionCounts.forEach((_, count) {
+      totalCompletions += count;
+    });
+
+    return Column(
+      children: [
+        // Total completions header
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primaryContainer,
+                Theme.of(context).colorScheme.secondaryContainer,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Text(
+                'Total Completions',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '$totalCompletions',
+                style: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Khetmeh list
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemBuilder: (context, index) {
         final plan = plans[index];
         final currentPage = khetmehProgress[plan.id] ?? plan.startPage;
         final progress = (currentPage - plan.startPage) /
@@ -100,78 +166,163 @@ class KhetmehTab extends StatelessWidget {
           expectedCompletionDate = DateTime.now().add(Duration(days: daysRemaining));
         }
 
+        // Check if khetmeh is active (Free Roam is always active)
+        final isActive = plan.id == 'plan5' ? true : (khetmehActiveStatus[plan.id] ?? true);
+
         return Card(
+          color: isActive
+              ? Theme.of(context).colorScheme.surface
+              : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           child: GestureDetector(
-            onTap: () => onPlanSelected(plan.id),
+            onTap: isActive ? () => onPlanSelected(plan.id) : null,
             child: ListTile(
-              leading: CircleAvatar(child: Text('${index + 1}')),
+              leading: CircleAvatar(
+                backgroundColor: isActive
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : Theme.of(context).colorScheme.surfaceContainerHighest,
+                foregroundColor: isActive
+                    ? Theme.of(context).colorScheme.onPrimaryContainer
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                child: Text('${index + 1}'),
+              ),
               title: Text(plan.title),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(plan.subtitle),
-                  Text('Page $currentPage of ${plan.endPage}'),
-                  const SizedBox(height: 4),
-                  LinearProgressIndicator(
-                    value: progress.isNaN || progress.isInfinite || progress.isNegative
-                        ? 0
-                        : progress,
-                  ),
-                  if (sahabaTodaySurah != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        "Today's surah: $sahabaTodaySurah",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.primary,
+                  // Only show details for active khetmehs
+                  if (isActive) ...[
+                    Text('Page $currentPage of ${plan.endPage}'),
+                    const SizedBox(height: 4),
+                    LinearProgressIndicator(
+                      value: progress.isNaN || progress.isInfinite || progress.isNegative
+                          ? 0
+                          : progress,
+                    ),
+                    if (sahabaTodaySurah != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          "Today's surah: $sahabaTodaySurah",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ),
                       ),
-                    ),
-                  if (scheduleStatus != null && scheduleColor != null && scheduleIcon != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Row(
-                        children: [
-                          Icon(
-                            scheduleIcon,
-                            size: 16,
-                            color: scheduleColor,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            scheduleStatus,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
+                    if (scheduleStatus != null && scheduleColor != null && scheduleIcon != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Row(
+                          children: [
+                            Icon(
+                              scheduleIcon,
+                              size: 16,
                               color: scheduleColor,
-                              fontSize: 13,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              scheduleStatus,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: scheduleColor,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  if (remainingPagesToday > 0 && plan.durationInDays > 0)
-                    Text(l.pagesToReadToday(remainingPagesToday)),
-                  if (expectedCompletionDate != null && plan.durationInDays > 0 && plan.id != 'plan4')
-                    Text(l.expectedCompletionDate(
-                        DateFormat.yMMMd().format(expectedCompletionDate))),
+                    if (remainingPagesToday > 0 && plan.durationInDays > 0)
+                      Text(l.pagesToReadToday(remainingPagesToday)),
+                    if (expectedCompletionDate != null && plan.durationInDays > 0 && plan.id != 'plan4')
+                      Text(l.expectedCompletionDate(
+                          DateFormat.yMMMd().format(expectedCompletionDate))),
+                  ],
                   if (completions > 0)
                     Text(l.khetmehCompletions(completions)),
                 ],
               ),
-              trailing: completions > 0
-                  ? IconButton(
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (completions > 0)
+                    IconButton(
                       icon: const Icon(Icons.history),
                       onPressed: () => _showCompletionHistory(context, plan),
                       tooltip: 'View completion history',
-                    )
-                  : null,
+                    ),
+                  // Free Roam (plan5) only shows Complete button, always active
+                  if (plan.id == 'plan5')
+                    FilledButton.tonal(
+                      onPressed: () => onCompleteKhetmeh(plan.id),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+                        foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        minimumSize: const Size(70, 36),
+                      ),
+                      child: const Text(
+                        'Complete',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  // Other khetmehs: Show Start button if inactive, or Complete/End buttons if active
+                  if (plan.id != 'plan5' && !isActive)
+                    FilledButton.tonal(
+                      onPressed: () => onStartKhetmeh(plan.id),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        minimumSize: const Size(60, 36),
+                      ),
+                      child: const Text(
+                        'Start',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  if (plan.id != 'plan5' && isActive) ...[
+                    // Complete button (increments count)
+                    FilledButton.tonal(
+                      onPressed: () => onCompleteKhetmeh(plan.id),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+                        foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        minimumSize: const Size(70, 36),
+                      ),
+                      child: const Text(
+                        'Complete',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    // End button (just deactivates)
+                    FilledButton.tonal(
+                      onPressed: () => onEndKhetmeh(plan.id),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                        foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        minimumSize: const Size(50, 36),
+                      ),
+                      child: const Text(
+                        'End',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
         );
       },
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemCount: plans.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemCount: plans.length,
+          ),
+        ),
+      ],
     );
   }
 
