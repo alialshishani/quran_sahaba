@@ -404,6 +404,7 @@ class _MyHomePageState extends State<MyHomePage> {
               khetmehDailyReadingCounts: _khetmehDailyReadingCounts,
               khetmehCompletionCounts: _khetmehCompletionCounts,
               khetmehCompletionHistory: _khetmehCompletionHistory,
+              khetmehStartDates: _khetmehStartDates,
             ),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,

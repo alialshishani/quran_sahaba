@@ -12,6 +12,7 @@ class KhetmehTab extends StatelessWidget {
     required this.khetmehDailyReadingCounts,
     required this.khetmehCompletionCounts,
     required this.khetmehCompletionHistory,
+    required this.khetmehStartDates,
   });
 
   final ValueChanged<String> onPlanSelected;
@@ -19,6 +20,7 @@ class KhetmehTab extends StatelessWidget {
   final Map<String, Map<String, int>> khetmehDailyReadingCounts;
   final Map<String, int> khetmehCompletionCounts;
   final Map<String, List<KhetmehCompletion>> khetmehCompletionHistory;
+  final Map<String, DateTime> khetmehStartDates;
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +58,40 @@ class KhetmehTab extends StatelessWidget {
         // For Sahaba Khetmeh, show today's surah
         String? sahabaTodaySurah;
         if (plan.id == 'plan4') {
-          final startDate = DateTime.now(); // We'll get this from state later
+          final startDate = khetmehStartDates[plan.id] ?? DateTime.now();
           final todaySurahNumber = getSahabaKhetmehCurrentDaySurah(startDate);
           final todaySurahInfo = surahInfos.firstWhere((s) => s.number == todaySurahNumber);
           final locale = Localizations.localeOf(context);
           sahabaTodaySurah = locale.languageCode == 'ar' ? todaySurahInfo.nameAr : todaySurahInfo.nameEn;
         }
 
+        // Calculate schedule status (ahead, on track, or behind)
+        String? scheduleStatus;
+        Color? scheduleColor;
+        IconData? scheduleIcon;
+
+        if (plan.durationInDays > 0 && khetmehStartDates.containsKey(plan.id)) {
+          final startDate = khetmehStartDates[plan.id]!;
+          final daysSinceStart = DateTime.now().difference(startDate).inDays;
+
+          // Calculate expected page based on days since start
+          final expectedPage = plan.startPage + (daysSinceStart * pagesPerDay).round();
+          final pageDifference = currentPage - expectedPage;
+
+          if (pageDifference > 10) {
+            scheduleStatus = 'Ahead of schedule';
+            scheduleColor = Colors.green;
+            scheduleIcon = Icons.trending_up;
+          } else if (pageDifference < -10) {
+            scheduleStatus = 'Behind schedule';
+            scheduleColor = Colors.orange;
+            scheduleIcon = Icons.trending_down;
+          } else {
+            scheduleStatus = 'On track';
+            scheduleColor = Colors.blue;
+            scheduleIcon = Icons.check_circle_outline;
+          }
+        }
 
         // Calculate expected completion date
         DateTime? expectedCompletionDate;
@@ -97,6 +126,28 @@ class KhetmehTab extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).colorScheme.primary,
                         ),
+                      ),
+                    ),
+                  if (scheduleStatus != null && scheduleColor != null && scheduleIcon != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        children: [
+                          Icon(
+                            scheduleIcon,
+                            size: 16,
+                            color: scheduleColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            scheduleStatus,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: scheduleColor,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   if (remainingPagesToday > 0 && plan.durationInDays > 0)
