@@ -85,6 +85,4 @@ class StatsTab extends StatelessWidget {
       ],
     );
   }
-
-  String get _todayKey => DateTime.now().toIso8601String().split('T').first;
 }

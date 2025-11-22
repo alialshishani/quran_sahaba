@@ -91,6 +91,4 @@ class KhetmehTab extends StatelessWidget {
       itemCount: plans.length,
     );
   }
-
-  String get _todayKey => DateFormat('yyyy-MM-dd').format(DateTime.now());
 }

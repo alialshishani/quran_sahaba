@@ -279,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.7),
+                                .withValues(alpha: 0.7),
                           ),
                     ),
                 ],
@@ -342,14 +342,8 @@ class _MyHomePageState extends State<MyHomePage> {
               duration: const Duration(milliseconds: 200),
               opacity: showChrome ? 1.0 : 0.0,
               child: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
                 selectedFontSize: 12,
                 unselectedFontSize: 12,
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                selectedItemColor: Theme.of(context).colorScheme.primary,
-                unselectedItemColor: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.6),
                 currentIndex: _tabIndex,
                 onTap: (index) {
                   if (index == _tabIndex) return;

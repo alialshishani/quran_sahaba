@@ -26,50 +26,184 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final lightBase = ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.white,
-        brightness: Brightness.light,
+    // Light theme with warm, elegant colors
+    final lightColorScheme = ColorScheme.light(
+      primary: const Color(0xFF1B5E20), // Deep green - Islamic color
+      onPrimary: Colors.white,
+      primaryContainer: const Color(0xFFC8E6C9), // Light green
+      onPrimaryContainer: const Color(0xFF003300),
+
+      secondary: const Color(0xFF6D4C41), // Warm brown
+      onSecondary: Colors.white,
+      secondaryContainer: const Color(0xFFD7CCC8), // Light brown
+      onSecondaryContainer: const Color(0xFF3E2723),
+
+      tertiary: const Color(0xFF004D40), // Teal accent
+      onTertiary: Colors.white,
+
+      error: const Color(0xFFB00020),
+      onError: Colors.white,
+
+      surface: const Color(0xFFFAFAFA), // Soft white
+      onSurface: const Color(0xFF1C1B1F),
+      surfaceContainerHighest: const Color(0xFFE7E0EC),
+
+      outline: const Color(0xFF79747E),
+      shadow: Colors.black26,
+    );
+
+    // Dark theme with rich, elegant colors
+    final darkColorScheme = ColorScheme.dark(
+      primary: const Color(0xFF81C784), // Soft green
+      onPrimary: const Color(0xFF003300),
+      primaryContainer: const Color(0xFF2E7D32), // Medium green
+      onPrimaryContainer: const Color(0xFFC8E6C9),
+
+      secondary: const Color(0xFFBCAAA4), // Soft brown
+      onSecondary: const Color(0xFF3E2723),
+      secondaryContainer: const Color(0xFF5D4037), // Medium brown
+      onSecondaryContainer: const Color(0xFFD7CCC8),
+
+      tertiary: const Color(0xFF80CBC4), // Soft teal
+      onTertiary: const Color(0xFF003300),
+
+      error: const Color(0xFFCF6679),
+      onError: const Color(0xFF690005),
+
+      surface: const Color(0xFF1C1B1F), // Rich dark
+      onSurface: const Color(0xFFE6E1E5),
+      surfaceContainerHighest: const Color(0xFF36343B),
+
+      outline: const Color(0xFF938F99),
+      shadow: Colors.black54,
+    );
+
+    final lightTheme = ThemeData(
+      useMaterial3: true,
+      colorScheme: lightColorScheme,
+      scaffoldBackgroundColor: lightColorScheme.surface,
+
+      appBarTheme: AppBarTheme(
+        backgroundColor: lightColorScheme.surface,
+        foregroundColor: lightColorScheme.onSurface,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: lightColorScheme.onSurface,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+
+      cardTheme: CardThemeData(
+        elevation: 1,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: Colors.white,
+        surfaceTintColor: lightColorScheme.primary.withValues(alpha: 0.05),
+      ),
+
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: lightColorScheme.primary,
+          foregroundColor: lightColorScheme.onPrimary,
+          elevation: 2,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: lightColorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: lightColorScheme.primary, width: 2),
+        ),
+      ),
+
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.white,
+        selectedItemColor: lightColorScheme.primary,
+        unselectedItemColor: lightColorScheme.onSurface.withValues(alpha: 0.6),
+        elevation: 8,
+        type: BottomNavigationBarType.fixed,
       ),
     );
-    final darkBase = ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.black,
-        brightness: Brightness.dark,
+
+    final darkTheme = ThemeData(
+      useMaterial3: true,
+      colorScheme: darkColorScheme,
+      scaffoldBackgroundColor: darkColorScheme.surface,
+
+      appBarTheme: AppBarTheme(
+        backgroundColor: darkColorScheme.surface,
+        foregroundColor: darkColorScheme.onSurface,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: darkColorScheme.onSurface,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+
+      cardTheme: CardThemeData(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: darkColorScheme.surfaceContainerHighest,
+        surfaceTintColor: darkColorScheme.primary.withValues(alpha: 0.08),
+      ),
+
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkColorScheme.primary,
+          foregroundColor: darkColorScheme.onPrimary,
+          elevation: 2,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: darkColorScheme.surfaceContainerHighest,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: darkColorScheme.primary, width: 2),
+        ),
+      ),
+
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: darkColorScheme.surfaceContainerHighest,
+        selectedItemColor: darkColorScheme.primary,
+        unselectedItemColor: darkColorScheme.onSurface.withValues(alpha: 0.6),
+        elevation: 8,
+        type: BottomNavigationBarType.fixed,
       ),
     );
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Quran Image Viewer',
       themeMode: _themeMode,
-      theme: lightBase.copyWith(
-        scaffoldBackgroundColor: Colors.white,
-        colorScheme: lightBase.colorScheme.copyWith(
-          primary: Colors.black,
-          surface: Colors.white,
-          onSurface: Colors.black,
-          inversePrimary: Colors.black87,
-        ),
-        appBarTheme: lightBase.appBarTheme.copyWith(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0,
-        ),
-      ),
-      darkTheme: darkBase.copyWith(
-        scaffoldBackgroundColor: Colors.black,
-        colorScheme: darkBase.colorScheme.copyWith(
-          primary: Colors.white,
-          surface: Colors.black,
-          onSurface: Colors.white,
-          inversePrimary: Colors.white70,
-        ),
-        appBarTheme: darkBase.appBarTheme.copyWith(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: _locale,
