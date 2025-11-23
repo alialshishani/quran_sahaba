@@ -26,77 +26,83 @@ class ReaderTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: PageView.builder(
-            controller: pageController,
-            reverse: true,
-            onPageChanged: onPageChanged,
-            itemBuilder: (context, index) {
-              // Calculate actual page number with wrapping
-              final actualIndex = index % totalPages;
-              final pageNumber = actualIndex + 1;
-              return InteractiveViewer(
-                child: Center(
-                  child: invertColors
-                      ? ColorFiltered(
-                          colorFilter: const ColorFilter.matrix([
-                            -1, 0, 0, 0, 255, //
-                            0, -1, 0, 0, 255, //
-                            0, 0, -1, 0, 255, //
-                            0, 0, 0, 1, 0, //
-                          ]),
-                          child: Image.asset(
+    final locale = Localizations.localeOf(context);
+    final isArabic = locale.languageCode == 'ar';
+
+    return Directionality(
+      textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: PageView.builder(
+              controller: pageController,
+              reverse: !isArabic,
+              onPageChanged: onPageChanged,
+              itemBuilder: (context, index) {
+                // Calculate actual page number with wrapping
+                final actualIndex = index % totalPages;
+                final pageNumber = actualIndex + 1;
+                return InteractiveViewer(
+                  child: Center(
+                    child: invertColors
+                        ? ColorFiltered(
+                            colorFilter: const ColorFilter.matrix([
+                              -1, 0, 0, 0, 255, //
+                              0, -1, 0, 0, 255, //
+                              0, 0, -1, 0, 255, //
+                              0, 0, 0, 1, 0, //
+                            ]),
+                            child: Image.asset(
+                              pageAssetPath(pageNumber),
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : Image.asset(
                             pageAssetPath(pageNumber),
                             fit: BoxFit.contain,
                           ),
-                        )
-                      : Image.asset(
-                          pageAssetPath(pageNumber),
-                          fit: BoxFit.contain,
-                        ),
-                ),
-              );
-            },
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: Opacity(
-            opacity: bottomBarVisible ? 1.0 : 0.0,
-            child: IgnorePointer(
-              ignoring: !bottomBarVisible,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12.0,
-                  horizontal: 16.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _arrowWithUnderline(
-                      context: context,
-                      icon: Icons.arrow_back,
-                      onPressed: onNext,
-                      showUnderline: currentPage.isEven,
-                    ),
-                    Text(currentPage.toString()),
-                    _arrowWithUnderline(
-                      context: context,
-                      icon: Icons.arrow_forward,
-                      onPressed: onPrevious,
-                      showUnderline: currentPage.isOdd,
-                    ),
-                  ],
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Opacity(
+              opacity: bottomBarVisible ? 1.0 : 0.0,
+              child: IgnorePointer(
+                ignoring: !bottomBarVisible,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12.0,
+                    horizontal: 16.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _arrowWithUnderline(
+                        context: context,
+                        icon: Icons.arrow_back,
+                        onPressed: onNext,
+                        showUnderline: currentPage.isEven,
+                      ),
+                      Text(currentPage.toString()),
+                      _arrowWithUnderline(
+                        context: context,
+                        icon: Icons.arrow_forward,
+                        onPressed: onPrevious,
+                        showUnderline: currentPage.isOdd,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

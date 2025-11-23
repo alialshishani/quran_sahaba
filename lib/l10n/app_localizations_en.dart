@@ -169,4 +169,90 @@ class AppLocalizationsEn extends AppLocalizations {
   String sahabaKhetmehDay(Object day, Object surah) {
     return 'Day $day: $surah';
   }
+
+  @override
+  String get totalCompletions => 'Total Completions';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get complete => 'Complete';
+
+  @override
+  String get end => 'End';
+
+  @override
+  String get viewCompletionHistory => 'View completion history';
+
+  @override
+  String get aheadOfSchedule => 'Ahead of schedule';
+
+  @override
+  String get behindSchedule => 'Behind schedule';
+
+  @override
+  String get onTrack => 'On track';
+
+  @override
+  String todaysSurah(Object surah) {
+    return 'Today\'s surah: $surah';
+  }
+
+  @override
+  String completionHistory(Object title) {
+    return '$title - History';
+  }
+
+  @override
+  String get noCompletionHistory => 'No completion history yet.';
+
+  @override
+  String completedInDays(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
+    );
+    return 'Completed in $count $_temp0';
+  }
+
+  @override
+  String started(Object date) {
+    return 'Started: $date';
+  }
+
+  @override
+  String finished(Object date) {
+    return 'Finished: $date';
+  }
+
+  @override
+  String get onTarget => 'On target!';
+
+  @override
+  String daysAhead(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
+    );
+    return '$count $_temp0 ahead';
+  }
+
+  @override
+  String daysOver(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
+    );
+    return '$count $_temp0 over';
+  }
+
+  @override
+  String get close => 'Close';
 }

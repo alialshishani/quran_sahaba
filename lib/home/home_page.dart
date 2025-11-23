@@ -625,7 +625,7 @@ class _MyHomePageState extends State<MyHomePage> {
       pageAssetPath: _pageAssetPath,
       onPageChanged: _handlePageChanged,
       onNext: () => _goToPage(_currentPage + 1),
-      onPrevious: () => _goToPage(_currentPage - 1),
+      onPrevious: _currentPage > 1 ? () => _goToPage(_currentPage - 1) : () {},
       bottomBarVisible: _isBottomBarVisible,
       invertColors: widget.isDarkMode,
     );

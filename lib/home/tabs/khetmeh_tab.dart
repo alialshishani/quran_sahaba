@@ -69,7 +69,7 @@ class KhetmehTab extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                'Total Completions',
+                l.totalCompletions,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -176,6 +176,7 @@ class KhetmehTab extends StatelessWidget {
           child: GestureDetector(
             onTap: isActive ? () => onPlanSelected(plan.id) : null,
             child: ListTile(
+              isThreeLine: true,
               leading: CircleAvatar(
                 backgroundColor: isActive
                     ? Theme.of(context).colorScheme.primaryContainer
@@ -249,67 +250,34 @@ class KhetmehTab extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.history),
                       onPressed: () => _showCompletionHistory(context, plan),
-                      tooltip: 'View completion history',
+                      tooltip: l.viewCompletionHistory,
                     ),
-                  // Free Roam (plan5) only shows Complete button, always active
                   if (plan.id == 'plan5')
-                    FilledButton.tonal(
+                    IconButton(
+                      icon: const Icon(Icons.check_circle),
                       onPressed: () => onCompleteKhetmeh(plan.id),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
-                        foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        minimumSize: const Size(70, 36),
-                      ),
-                      child: const Text(
-                        'Complete',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                      ),
+                      tooltip: l.complete,
+                      color: Theme.of(context).colorScheme.tertiary,
                     ),
-                  // Other khetmehs: Show Start button if inactive, or Complete/End buttons if active
                   if (plan.id != 'plan5' && !isActive)
-                    FilledButton.tonal(
+                    IconButton(
+                      icon: const Icon(Icons.play_arrow),
                       onPressed: () => onStartKhetmeh(plan.id),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        minimumSize: const Size(60, 36),
-                      ),
-                      child: const Text(
-                        'Start',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                      ),
+                      tooltip: l.start,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   if (plan.id != 'plan5' && isActive) ...[
-                    // Complete button (increments count)
-                    FilledButton.tonal(
+                    IconButton(
+                      icon: const Icon(Icons.check_circle),
                       onPressed: () => onCompleteKhetmeh(plan.id),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
-                        foregroundColor: Theme.of(context).colorScheme.onTertiaryContainer,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        minimumSize: const Size(70, 36),
-                      ),
-                      child: const Text(
-                        'Complete',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                      ),
+                      tooltip: l.complete,
+                      color: Theme.of(context).colorScheme.tertiary,
                     ),
-                    const SizedBox(width: 4),
-                    // End button (just deactivates)
-                    FilledButton.tonal(
+                    IconButton(
+                      icon: const Icon(Icons.stop),
                       onPressed: () => onEndKhetmeh(plan.id),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                        foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        minimumSize: const Size(50, 36),
-                      ),
-                      child: const Text(
-                        'End',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                      ),
+                      tooltip: l.end,
+                      color: Theme.of(context).colorScheme.error,
                     ),
                   ],
                 ],

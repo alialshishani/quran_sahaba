@@ -385,6 +385,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Day {day}: {surah}'**
   String sahabaKhetmehDay(Object day, Object surah);
+
+  /// No description provided for @totalCompletions.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Completions'**
+  String get totalCompletions;
+
+  /// No description provided for @start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start;
+
+  /// No description provided for @complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// No description provided for @end.
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get end;
+
+  /// No description provided for @viewCompletionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View completion history'**
+  String get viewCompletionHistory;
+
+  /// No description provided for @aheadOfSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Ahead of schedule'**
+  String get aheadOfSchedule;
+
+  /// No description provided for @behindSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Behind schedule'**
+  String get behindSchedule;
+
+  /// No description provided for @onTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'On track'**
+  String get onTrack;
+
+  /// No description provided for @todaysSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s surah: {surah}'**
+  String todaysSurah(Object surah);
+
+  /// No description provided for @completionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} - History'**
+  String completionHistory(Object title);
+
+  /// No description provided for @noCompletionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No completion history yet.'**
+  String get noCompletionHistory;
+
+  /// No description provided for @completedInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed in {count} {count, plural, =1{day} other{days}}'**
+  String completedInDays(num count);
+
+  /// No description provided for @started.
+  ///
+  /// In en, this message translates to:
+  /// **'Started: {date}'**
+  String started(Object date);
+
+  /// No description provided for @finished.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished: {date}'**
+  String finished(Object date);
+
+  /// No description provided for @onTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'On target!'**
+  String get onTarget;
+
+  /// No description provided for @daysAhead.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {count, plural, =1{day} other{days}} ahead'**
+  String daysAhead(num count);
+
+  /// No description provided for @daysOver.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {count, plural, =1{day} other{days}} over'**
+  String daysOver(num count);
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
 }
 
 class _AppLocalizationsDelegate

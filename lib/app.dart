@@ -70,9 +70,9 @@ class _MyAppState extends State<MyApp> {
       error: const Color(0xFFCF6679),
       onError: const Color(0xFF690005),
 
-      surface: const Color(0xFF1C1B1F), // Rich dark
+      surface: const Color(0xFF000000), // Pure black for image merging
       onSurface: const Color(0xFFE6E1E5),
-      surfaceContainerHighest: const Color(0xFF36343B),
+      surfaceContainerHighest: const Color(0xFF1A1A1A), // Very dark gray
 
       outline: const Color(0xFF938F99),
       shadow: Colors.black54,
@@ -190,7 +190,7 @@ class _MyAppState extends State<MyApp> {
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: darkColorScheme.surfaceContainerHighest,
+        backgroundColor: const Color(0xFF000000), // Pure black
         selectedItemColor: darkColorScheme.primary,
         unselectedItemColor: darkColorScheme.onSurface.withValues(alpha: 0.6),
         elevation: 8,
