@@ -24,6 +24,8 @@ class ReaderTab extends StatefulWidget {
     required this.tafseerContent,
     required this.hasDownloadedTafseer,
     required this.onFetchTafseer,
+    required this.selectedTafseerId,
+    required this.onSelectTafseer,
   });
 
   final PageController pageController;
@@ -45,6 +47,8 @@ class ReaderTab extends StatefulWidget {
   final TafseerContent? tafseerContent;
   final bool hasDownloadedTafseer;
   final Future<TafseerContent?> Function() onFetchTafseer;
+  final String? selectedTafseerId;
+  final Function(String?) onSelectTafseer;
 
   @override
   State<ReaderTab> createState() => _ReaderTabState();
@@ -209,8 +213,14 @@ class _ReaderTabState extends State<ReaderTab> {
                     heroTag: 'tafseer_button',
                     onPressed: () async {
                       print('Tafseer button tapped for page ${widget.currentPage}');
-                      print('Tafseer content available: ${widget.tafseerContent != null}');
 
+                      // If no tafseer is selected, show selection dialog
+                      if (widget.selectedTafseerId == null) {
+                        await _showTafseerSelectionDialog(context, l);
+                        return;
+                      }
+
+                      // Check if we have content for this page
                       if (widget.tafseerContent != null) {
                         print('Tafseer ayahs count: ${widget.tafseerContent!.ayahs.length}');
                         _showTafseerDialog(context, l);
@@ -644,6 +654,72 @@ class _ReaderTabState extends State<ReaderTab> {
         ),
       ),
     );
+  }
+
+  Future<void> _showTafseerSelectionDialog(
+    BuildContext context,
+    AppLocalizations l,
+  ) async {
+    final locale = Localizations.localeOf(context);
+    final isArabic = locale.languageCode == 'ar';
+    final availableTafseers = getAvailableTafseers();
+
+    final selected = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l.selectTafseer),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: availableTafseers.map((tafseer) {
+              final isSelected = widget.selectedTafseerId == tafseer.id;
+              return ListTile(
+                selected: isSelected,
+                leading: CircleAvatar(
+                  backgroundColor: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  child: Icon(
+                    isSelected ? Icons.check : Icons.menu_book,
+                    color: isSelected
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.onSurface,
+                    size: 20,
+                  ),
+                ),
+                title: Text(
+                  isArabic ? tafseer.nameAr : tafseer.nameEn,
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+                subtitle: Text('${tafseer.author} • ${tafseer.language.toUpperCase()}'),
+                onTap: () => Navigator.pop(context, tafseer.id),
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l.cancel),
+          ),
+        ],
+      ),
+    );
+
+    if (selected != null && mounted) {
+      widget.onSelectTafseer(selected);
+
+      // Show snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${l.viewing} ${isArabic ? availableTafseers.firstWhere((t) => t.id == selected).nameAr : availableTafseers.firstWhere((t) => t.id == selected).nameEn}',
+          ),
+        ),
+      );
+    }
   }
 
   Widget _arrowWithUnderline({

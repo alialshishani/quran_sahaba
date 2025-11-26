@@ -720,27 +720,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _navigateToTafseerLibrary(BuildContext context) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TafseerLibraryScreen(
-          downloadedTafseers: _downloadedTafseers,
-          selectedTafseerId: _selectedTafseerId,
-          onDownloadTafseer: downloadTafseer,
-          onDeleteTafseer: deleteTafseer,
-          onSelectTafseer: selectTafseer,
-        ),
-      ),
-    );
-
-    // Force rebuild after returning to ensure UI reflects changes
-    print('Returned from tafseer library');
-    print('Current state - Downloaded: $_downloadedTafseers, Selected: $_selectedTafseerId');
-    print('Available tafseer data: ${_tafseerContent.keys.toList()}');
-    setState(() {});
-  }
-
   void _toggleChrome() {
     setState(() {
       _isBottomBarVisible = !_isBottomBarVisible;
@@ -968,7 +947,6 @@ class _MyHomePageState extends State<MyHomePage> {
               onLocaleChanged: widget.onLocaleChanged,
               showTasbih: _showTasbih,
               onToggleTasbih: _toggleShowTasbih,
-              onOpenTafseerLibrary: () => _navigateToTafseerLibrary(context),
             ),
         },
       ),
@@ -1062,6 +1040,8 @@ class _MyHomePageState extends State<MyHomePage> {
       tafseerContent: getTafseerForCurrentPage(),
       hasDownloadedTafseer: _downloadedTafseers.isNotEmpty,
       onFetchTafseer: fetchTafseerForCurrentPage,
+      selectedTafseerId: _selectedTafseerId,
+      onSelectTafseer: selectTafseer,
     );
   }
 

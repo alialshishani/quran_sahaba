@@ -11,7 +11,6 @@ class SettingsTab extends StatelessWidget {
     required this.onLocaleChanged,
     required this.showTasbih,
     required this.onToggleTasbih,
-    required this.onOpenTafseerLibrary,
   });
 
   final VoidCallback onToggleLocale;
@@ -21,7 +20,6 @@ class SettingsTab extends StatelessWidget {
   final ValueChanged<Locale> onLocaleChanged;
   final bool showTasbih;
   final VoidCallback onToggleTasbih;
-  final VoidCallback onOpenTafseerLibrary;
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +62,6 @@ class SettingsTab extends StatelessWidget {
             onChanged: (_) => onToggleTasbih(),
           ),
           onTap: onToggleTasbih,
-        ),
-        const Divider(),
-        ListTile(
-          leading: const Icon(Icons.library_books),
-          title: Text(AppLocalizations.of(context)!.tafseerLibrary),
-          subtitle: Text('Download and manage tafseer sources'),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-          onTap: onOpenTafseerLibrary,
         ),
       ],
     );
