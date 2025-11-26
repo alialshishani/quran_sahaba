@@ -209,79 +209,38 @@ class _ReaderTabState extends State<ReaderTab> {
                 opacity: widget.bottomBarVisible ? 1.0 : 0.0,
                 child: IgnorePointer(
                   ignoring: !widget.bottomBarVisible,
-                  child: FloatingActionButton(
-                    heroTag: 'tafseer_button',
-                    onPressed: () async {
-                      print('Tafseer button tapped for page ${widget.currentPage}');
-
-                      // If no tafseer is selected, show selection dialog
-                      if (widget.selectedTafseerId == null) {
-                        await _showTafseerSelectionDialog(context, l);
-                        return;
-                      }
-
-                      // Check if we have content for this page
-                      if (widget.tafseerContent != null) {
-                        print('Tafseer ayahs count: ${widget.tafseerContent!.ayahs.length}');
-                        _showTafseerDialog(context, l);
-                      } else {
-                        // Fetch on-demand
-                        print('Fetching tafseer on-demand for page ${widget.currentPage}');
-
-                        // Show loading dialog
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) => const Center(
-                            child: Card(
-                              child: Padding(
-                                padding: EdgeInsets.all(24.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    CircularProgressIndicator(),
-                                    SizedBox(height: 16),
-                                    Text('Loading tafseer...'),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-
-                        try {
-                          final content = await widget.onFetchTafseer();
-
-                          if (mounted) {
-                            Navigator.pop(context); // Close loading dialog
-
-                            if (content != null) {
-                              // Tafseer fetched successfully, show it
-                              _showTafseerDialogWithContent(context, l, content);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l.noTafseerAvailable)),
-                              );
-                            }
-                          }
-                        } catch (e) {
-                          if (mounted) {
-                            Navigator.pop(context); // Close loading dialog
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error loading tafseer: $e')),
-                            );
-                          }
-                        }
-                      }
+                  child: GestureDetector(
+                    onLongPress: () async {
+                      // Long press to change tafseer
+                      await _showTafseerSelectionDialog(context, l);
                     },
+                    child: FloatingActionButton(
+                      heroTag: 'tafseer_button',
+                      onPressed: () async {
+                        print('Tafseer button tapped for page ${widget.currentPage}');
+
+                        // If no tafseer is selected, show selection dialog
+                        if (widget.selectedTafseerId == null) {
+                          await _showTafseerSelectionDialog(context, l);
+                          // After selection, automatically fetch and show
+                          if (widget.selectedTafseerId != null) {
+                            await _viewTafseer(context, l);
+                          }
+                          return;
+                        }
+
+                        // Tafseer is selected, fetch and show it
+                        await _viewTafseer(context, l);
+                      },
                     backgroundColor: widget.tafseerContent != null
                         ? Theme.of(context).colorScheme.primaryContainer
                         : Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: Icon(
-                      Icons.menu_book,
-                      color: widget.tafseerContent != null
-                          ? Theme.of(context).colorScheme.onPrimaryContainer
-                          : Theme.of(context).colorScheme.onSurface,
+                      child: Icon(
+                        Icons.menu_book,
+                        color: widget.tafseerContent != null
+                            ? Theme.of(context).colorScheme.onPrimaryContainer
+                            : Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
                 ),
@@ -443,6 +402,9 @@ class _ReaderTabState extends State<ReaderTab> {
   }
 
   void _showTafseerDialog(BuildContext context, AppLocalizations l) {
+    final locale = Localizations.localeOf(context);
+    final isArabic = locale.languageCode == 'ar';
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -463,6 +425,50 @@ class _ReaderTabState extends State<ReaderTab> {
                   ),
                 ],
               ),
+              // Tafseer selector - non-intrusive at top
+              if (widget.selectedTafseerId != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: InkWell(
+                    onTap: () async {
+                      Navigator.pop(context);
+                      await _showTafseerSelectionDialog(context, l);
+                      // After selection, fetch new tafseer
+                      if (widget.selectedTafseerId != null && mounted) {
+                        await _viewTafseer(context, l);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.swap_horiz,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              isArabic
+                                  ? getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameAr
+                                  : getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameEn,
+                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               Expanded(
                 child: widget.tafseerContent == null
                     ? Center(child: Text(l.noTafseerAvailable))
@@ -554,6 +560,9 @@ class _ReaderTabState extends State<ReaderTab> {
     AppLocalizations l,
     TafseerContent content,
   ) {
+    final locale = Localizations.localeOf(context);
+    final isArabic = locale.languageCode == 'ar';
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -574,6 +583,50 @@ class _ReaderTabState extends State<ReaderTab> {
                   ),
                 ],
               ),
+              // Tafseer selector - non-intrusive at top
+              if (widget.selectedTafseerId != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: InkWell(
+                    onTap: () async {
+                      Navigator.pop(context);
+                      await _showTafseerSelectionDialog(context, l);
+                      // After selection, fetch new tafseer
+                      if (widget.selectedTafseerId != null && mounted) {
+                        await _viewTafseer(context, l);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.swap_horiz,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              isArabic
+                                  ? getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameAr
+                                  : getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameEn,
+                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
@@ -654,6 +707,65 @@ class _ReaderTabState extends State<ReaderTab> {
         ),
       ),
     );
+  }
+
+  Future<void> _viewTafseer(
+    BuildContext context,
+    AppLocalizations l,
+  ) async {
+    // Check if we have content for this page
+    if (widget.tafseerContent != null) {
+      print('Tafseer ayahs count: ${widget.tafseerContent!.ayahs.length}');
+      _showTafseerDialog(context, l);
+    } else {
+      // Fetch on-demand
+      print('Fetching tafseer on-demand for page ${widget.currentPage}');
+
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading tafseer...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      try {
+        final content = await widget.onFetchTafseer();
+
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+
+          if (content != null) {
+            // Tafseer fetched successfully, show it
+            _showTafseerDialogWithContent(context, l, content);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l.noTafseerAvailable)),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error loading tafseer: $e')),
+          );
+        }
+      }
+    }
   }
 
   Future<void> _showTafseerSelectionDialog(
