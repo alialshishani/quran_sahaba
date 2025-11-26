@@ -493,6 +493,336 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
+
+  /// No description provided for @bookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get bookmarks;
+
+  /// No description provided for @addBookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Bookmark'**
+  String get addBookmark;
+
+  /// No description provided for @removeBookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Bookmark'**
+  String get removeBookmark;
+
+  /// No description provided for @bookmarkAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark added'**
+  String get bookmarkAdded;
+
+  /// No description provided for @bookmarkRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark removed'**
+  String get bookmarkRemoved;
+
+  /// No description provided for @noBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarks yet. Tap the bookmark icon while reading to save a page.'**
+  String get noBookmarks;
+
+  /// No description provided for @bookmarkNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get bookmarkNote;
+
+  /// No description provided for @bookmarkLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label (optional)'**
+  String get bookmarkLabel;
+
+  /// No description provided for @saveBookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveBookmark;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @editBookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Bookmark'**
+  String get editBookmark;
+
+  /// No description provided for @deleteBookmark.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Bookmark'**
+  String get deleteBookmark;
+
+  /// No description provided for @page.
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get page;
+
+  /// No description provided for @readingSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading Sessions'**
+  String get readingSessions;
+
+  /// No description provided for @currentSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Session'**
+  String get currentSession;
+
+  /// No description provided for @totalReadingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Reading Time'**
+  String get totalReadingTime;
+
+  /// No description provided for @averageSessionTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Session Time'**
+  String get averageSessionTime;
+
+  /// No description provided for @longestSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Session'**
+  String get longestSession;
+
+  /// No description provided for @statsSessionsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions today'**
+  String get statsSessionsToday;
+
+  /// No description provided for @statsReadingTimeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading time today'**
+  String get statsReadingTimeToday;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String minutes(Object count);
+
+  /// No description provided for @hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h {minutes}m'**
+  String hours(Object count, Object minutes);
+
+  /// No description provided for @tasbihCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasbih Counter'**
+  String get tasbihCounter;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @count.
+  ///
+  /// In en, this message translates to:
+  /// **'Count'**
+  String get count;
+
+  /// No description provided for @showTasbih.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Tasbih Counter'**
+  String get showTasbih;
+
+  /// No description provided for @tasbihCounterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Display tasbih counter in reader'**
+  String get tasbihCounterDescription;
+
+  /// No description provided for @tafseer.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafseer'**
+  String get tafseer;
+
+  /// No description provided for @tafseerLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafseer Library'**
+  String get tafseerLibrary;
+
+  /// No description provided for @downloadTafseer.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Tafseer'**
+  String get downloadTafseer;
+
+  /// No description provided for @deleteTafseer.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Tafseer'**
+  String get deleteTafseer;
+
+  /// No description provided for @tafseerDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafseer downloaded'**
+  String get tafseerDownloaded;
+
+  /// No description provided for @tafseerDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafseer deleted'**
+  String get tafseerDeleted;
+
+  /// No description provided for @downloadingTafseer.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading tafseer...'**
+  String get downloadingTafseer;
+
+  /// No description provided for @noTafseerAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No tafseer available for this page'**
+  String get noTafseerAvailable;
+
+  /// No description provided for @noTafseerDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'No tafseer downloaded yet. Download from Tafseer Library.'**
+  String get noTafseerDownloaded;
+
+  /// No description provided for @selectTafseer.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Tafseer'**
+  String get selectTafseer;
+
+  /// No description provided for @availableTafseers.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Tafseers'**
+  String get availableTafseers;
+
+  /// No description provided for @downloadedTafseers.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded Tafseers'**
+  String get downloadedTafseers;
+
+  /// No description provided for @tafseerSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size: {size}'**
+  String tafseerSize(Object size);
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @viewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewing'**
+  String get viewing;
+
+  /// No description provided for @showTafseer.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Tafseer'**
+  String get showTafseer;
+
+  /// No description provided for @hideTafseer.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Tafseer'**
+  String get hideTafseer;
+
+  /// No description provided for @tafseerForPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafseer for Page {page}'**
+  String tafseerForPage(Object page);
+
+  /// No description provided for @ayah.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayah'**
+  String get ayah;
+
+  /// No description provided for @tafseerIbnKathir.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir Ibn Kathir'**
+  String get tafseerIbnKathir;
+
+  /// No description provided for @tafseerJalalayn.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir al-Jalalayn'**
+  String get tafseerJalalayn;
+
+  /// No description provided for @tafseerSaadi.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir al-Sa\'di'**
+  String get tafseerSaadi;
+
+  /// No description provided for @tafseerMuyassar.
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir al-Muyassar'**
+  String get tafseerMuyassar;
+
+  /// No description provided for @englishTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'English Translation'**
+  String get englishTranslation;
+
+  /// No description provided for @downloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading...'**
+  String get downloading;
+
+  /// No description provided for @downloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get downloaded;
+
+  /// No description provided for @notDownloaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Downloaded'**
+  String get notDownloaded;
 }
 
 class _AppLocalizationsDelegate

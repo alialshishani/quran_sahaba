@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:quran_sahaba/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/quran_data.dart';
+import '../services/quran_api_service.dart';
 import 'tabs/settings_tab.dart';
 import 'tabs/khetmeh_tab.dart';
 import 'tabs/navigate_tab.dart';
 import 'tabs/reader_tab.dart';
 import 'tabs/stats_tab.dart';
+import 'tafseer_library_screen.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -39,6 +41,12 @@ class _MyHomePageState extends State<MyHomePage> {
   static const String _khetmehCompletionHistoryKey = 'khetmeh_completion_history';
   static const String _khetmehStartDatesKey = 'khetmeh_start_dates';
   static const String _khetmehActiveStatusKey = 'khetmeh_active_status';
+  static const String _bookmarksKey = 'bookmarks';
+  static const String _readingSessionsKey = 'reading_sessions';
+  static const String _showTasbihKey = 'show_tasbih';
+  static const String _downloadedTafseersKey = 'downloaded_tafseers';
+  static const String _selectedTafseerKey = 'selected_tafseer';
+  static const String _tafseerContentKey = 'tafseer_content';
   late final PageController _pageController;
   final TextEditingController _pageJumpController = TextEditingController();
   int _currentPage = 1;
@@ -54,6 +62,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Map<String, DateTime> _khetmehStartDates = {};
   Map<String, bool> _khetmehActiveStatus = {};
   String _selectedKhetmehId = ''; // Changed to id
+  List<Bookmark> _bookmarks = [];
+  List<ReadingSession> _readingSessions = [];
+  DateTime? _currentSessionStartTime;
+  int _currentSessionDuration = 0;
+  bool _showTasbih = false;
+  List<String> _downloadedTafseers = [];
+  String? _selectedTafseerId;
+  Map<String, Map<int, TafseerContent>> _tafseerContent = {}; // sourceId -> page -> content
   late AppLocalizations _l;
 
   @override
@@ -71,10 +87,18 @@ class _MyHomePageState extends State<MyHomePage> {
     _loadKhetmehCompletionHistory();
     _loadKhetmehStartDates();
     _loadKhetmehActiveStatus();
+    _loadBookmarks();
+    _loadReadingSessions();
+    _loadShowTasbih();
+    _loadDownloadedTafseers();
+    _loadSelectedTafseer();
+    _loadTafseerContent();
+    _startReadingSession();
   }
 
   @override
   void dispose() {
+    _endReadingSession();
     _pageController.dispose();
     _pageJumpController.dispose();
     super.dispose();
@@ -325,6 +349,398 @@ class _MyHomePageState extends State<MyHomePage> {
     await prefs.setString(_khetmehActiveStatusKey, jsonEncode(_khetmehActiveStatus));
   }
 
+  // Bookmark methods
+  Future<void> _loadBookmarks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_bookmarksKey);
+    if (data == null) return;
+
+    final decoded = jsonDecode(data) as List;
+    setState(() {
+      _bookmarks = decoded
+          .map((item) => Bookmark.fromJson(item as Map<String, dynamic>))
+          .toList();
+    });
+  }
+
+  Future<void> _persistBookmarks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final encoded = _bookmarks.map((b) => b.toJson()).toList();
+    await prefs.setString(_bookmarksKey, jsonEncode(encoded));
+  }
+
+  Future<void> addBookmark({String? label, String? note}) async {
+    final bookmark = Bookmark(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      page: _currentPage,
+      label: label,
+      note: note,
+      createdAt: DateTime.now(),
+    );
+
+    setState(() {
+      _bookmarks.add(bookmark);
+    });
+    await _persistBookmarks();
+  }
+
+  Future<void> removeBookmark(String id) async {
+    setState(() {
+      _bookmarks.removeWhere((b) => b.id == id);
+    });
+    await _persistBookmarks();
+  }
+
+  Future<void> updateBookmark(Bookmark updatedBookmark) async {
+    setState(() {
+      final index = _bookmarks.indexWhere((b) => b.id == updatedBookmark.id);
+      if (index != -1) {
+        _bookmarks[index] = updatedBookmark;
+      }
+    });
+    await _persistBookmarks();
+  }
+
+  bool isCurrentPageBookmarked() {
+    return _bookmarks.any((b) => b.page == _currentPage);
+  }
+
+  Bookmark? getCurrentPageBookmark() {
+    try {
+      return _bookmarks.firstWhere((b) => b.page == _currentPage);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Reading session methods
+  Future<void> _loadReadingSessions() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_readingSessionsKey);
+    if (data == null) return;
+
+    final decoded = jsonDecode(data) as List;
+    setState(() {
+      _readingSessions = decoded
+          .map((item) => ReadingSession.fromJson(item as Map<String, dynamic>))
+          .toList();
+    });
+  }
+
+  Future<void> _persistReadingSessions() async {
+    final prefs = await SharedPreferences.getInstance();
+    final encoded = _readingSessions.map((s) => s.toJson()).toList();
+    await prefs.setString(_readingSessionsKey, jsonEncode(encoded));
+  }
+
+  void _startReadingSession() {
+    setState(() {
+      _currentSessionStartTime = DateTime.now();
+      _currentSessionDuration = 0;
+    });
+  }
+
+  void _endReadingSession() {
+    if (_currentSessionStartTime == null) return;
+
+    final duration = DateTime.now().difference(_currentSessionStartTime!).inSeconds;
+
+    // Only save sessions longer than 10 seconds
+    if (duration > 10) {
+      final session = ReadingSession(
+        startTime: _currentSessionStartTime!,
+        endTime: DateTime.now(),
+        durationInSeconds: duration,
+      );
+
+      _readingSessions.add(session);
+      _persistReadingSessions();
+    }
+
+    setState(() {
+      _currentSessionStartTime = null;
+      _currentSessionDuration = 0;
+    });
+  }
+
+  int getCurrentSessionDuration() {
+    if (_currentSessionStartTime == null) return 0;
+    return DateTime.now().difference(_currentSessionStartTime!).inSeconds;
+  }
+
+  // Tasbih methods
+  Future<void> _loadShowTasbih() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _showTasbih = prefs.getBool(_showTasbihKey) ?? false;
+    });
+  }
+
+  Future<void> _toggleShowTasbih() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _showTasbih = !_showTasbih;
+    });
+    await prefs.setBool(_showTasbihKey, _showTasbih);
+  }
+
+  // Tafseer methods
+  Future<void> _loadDownloadedTafseers() async {
+    print('Loading downloaded tafseers list...');
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getStringList(_downloadedTafseersKey);
+    if (data != null) {
+      setState(() {
+        _downloadedTafseers = data;
+      });
+      print('Downloaded tafseers: $_downloadedTafseers');
+    } else {
+      print('No downloaded tafseers found');
+    }
+  }
+
+  Future<void> _persistDownloadedTafseers() async {
+    print('Persisting downloaded tafseers: $_downloadedTafseers');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_downloadedTafseersKey, _downloadedTafseers);
+  }
+
+  Future<void> _loadSelectedTafseer() async {
+    print('Loading selected tafseer...');
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_selectedTafseerKey);
+    if (data != null) {
+      setState(() {
+        _selectedTafseerId = data;
+      });
+      print('Selected tafseer: $_selectedTafseerId');
+    } else {
+      print('No tafseer selected');
+    }
+  }
+
+  Future<void> _persistSelectedTafseer() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_selectedTafseerId != null) {
+      await prefs.setString(_selectedTafseerKey, _selectedTafseerId!);
+    } else {
+      await prefs.remove(_selectedTafseerKey);
+    }
+  }
+
+  Future<void> _loadTafseerContent() async {
+    print('Loading tafseer content from storage...');
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_tafseerContentKey);
+
+    if (data == null) {
+      print('No tafseer content found in storage');
+      return;
+    }
+
+    try {
+      final decoded = jsonDecode(data) as Map<String, dynamic>;
+      final Map<String, Map<int, TafseerContent>> tempMap = {};
+
+      decoded.forEach((sourceId, pagesData) {
+        final Map<int, TafseerContent> pageMap = {};
+        (pagesData as Map<String, dynamic>).forEach((pageStr, contentData) {
+          final page = int.parse(pageStr);
+          final content = TafseerContent.fromJson(contentData as Map<String, dynamic>);
+          pageMap[page] = content;
+          print('Loaded page $page for $sourceId: ${content.ayahs.length} ayahs');
+        });
+        tempMap[sourceId] = pageMap;
+        print('Loaded tafseer for $sourceId: ${pageMap.keys.length} pages total');
+      });
+
+      setState(() {
+        _tafseerContent = tempMap;
+      });
+
+      print('Tafseer content loaded successfully: ${tempMap.keys.toList()}');
+    } catch (e) {
+      print('Error loading tafseer content: $e');
+    }
+  }
+
+  Future<void> _persistTafseerContent() async {
+    print('Persisting tafseer content...');
+    final prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> toEncode = {};
+
+    _tafseerContent.forEach((sourceId, pageMap) {
+      final Map<String, dynamic> pages = {};
+      pageMap.forEach((page, content) {
+        pages[page.toString()] = content.toJson();
+      });
+      toEncode[sourceId] = pages;
+      print('Preparing to save $sourceId: ${pageMap.keys.length} pages');
+    });
+
+    final encoded = jsonEncode(toEncode);
+    print('Encoded data size: ${encoded.length} bytes');
+    await prefs.setString(_tafseerContentKey, encoded);
+    print('Tafseer content persisted successfully');
+  }
+
+  Future<void> downloadTafseer(TafseerSource source) async {
+    try {
+      print('Starting download for ${source.nameEn}...');
+
+      // Download tafseer for all 604 pages of the Quran
+      final pagesToDownload = List.generate(604, (index) => index + 1);
+
+      print('Will download ${pagesToDownload.length} pages (this will take several minutes)');
+
+      // Download tafseer from Quran.com API
+      final pages = await QuranApiService.downloadTafseerForPages(
+        sourceId: source.id,
+        pages: pagesToDownload,
+        onProgress: (current, total) {
+          print('Progress: $current/$total pages completed');
+        },
+      );
+
+      print('Download complete! Got ${pages.length} pages of tafseer');
+      print('Pages: ${pages.keys.toList()}');
+
+      // Debug: Check each page's content
+      pages.forEach((pageNum, content) {
+        print('Page $pageNum: ${content.ayahs.length} ayahs');
+        if (content.ayahs.isEmpty) {
+          print('WARNING: Page $pageNum has 0 ayahs!');
+        }
+      });
+
+      if (pages.isEmpty) {
+        throw Exception('No tafseer data downloaded');
+      }
+
+      setState(() {
+        if (!_downloadedTafseers.contains(source.id)) {
+          _downloadedTafseers.add(source.id);
+        }
+        _tafseerContent[source.id] = pages;
+      });
+
+      await _persistDownloadedTafseers();
+      await _persistTafseerContent();
+
+      print('Tafseer saved successfully');
+    } catch (e) {
+      print('Error downloading tafseer: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteTafseer(String sourceId) async {
+    setState(() {
+      _downloadedTafseers.remove(sourceId);
+      _tafseerContent.remove(sourceId);
+      if (_selectedTafseerId == sourceId) {
+        _selectedTafseerId = null;
+      }
+    });
+
+    await _persistDownloadedTafseers();
+    await _persistTafseerContent();
+    await _persistSelectedTafseer();
+  }
+
+  Future<void> selectTafseer(String? sourceId) async {
+    setState(() {
+      _selectedTafseerId = sourceId;
+    });
+    await _persistSelectedTafseer();
+  }
+
+  TafseerContent? getTafseerForCurrentPage() {
+    if (_selectedTafseerId == null) {
+      print('No tafseer selected');
+      return null;
+    }
+
+    final content = _tafseerContent[_selectedTafseerId]?[_currentPage];
+
+    if (content == null) {
+      print('No tafseer for page $_currentPage (selected: $_selectedTafseerId)');
+      print('Available pages: ${_tafseerContent[_selectedTafseerId]?.keys.toList()}');
+    } else {
+      print('Found tafseer for page $_currentPage with ${content.ayahs.length} ayahs');
+      if (content.ayahs.isEmpty) {
+        print('WARNING: Content exists for page $_currentPage but has 0 ayahs!');
+        print('Content details - sourceId: ${content.sourceId}, page: ${content.page}');
+      }
+    }
+
+    return content;
+  }
+
+  // Fetch tafseer for current page on-demand
+  Future<TafseerContent?> fetchTafseerForCurrentPage() async {
+    if (_selectedTafseerId == null) {
+      print('No tafseer selected');
+      return null;
+    }
+
+    // Check if we already have it cached
+    final cached = _tafseerContent[_selectedTafseerId]?[_currentPage];
+    if (cached != null) {
+      print('Tafseer for page $_currentPage already cached');
+      return cached;
+    }
+
+    try {
+      print('Fetching tafseer on-demand for page $_currentPage...');
+
+      final content = await QuranApiService.downloadTafseerForPage(
+        sourceId: _selectedTafseerId!,
+        page: _currentPage,
+      );
+
+      // Cache it
+      setState(() {
+        if (!_downloadedTafseers.contains(_selectedTafseerId)) {
+          _downloadedTafseers.add(_selectedTafseerId!);
+        }
+        _tafseerContent[_selectedTafseerId!] ??= {};
+        _tafseerContent[_selectedTafseerId!]![_currentPage] = content;
+      });
+
+      // Persist the new data
+      await _persistDownloadedTafseers();
+      await _persistTafseerContent();
+
+      print('Tafseer for page $_currentPage fetched and cached successfully');
+      return content;
+    } catch (e) {
+      print('Error fetching tafseer for page $_currentPage: $e');
+      return null;
+    }
+  }
+
+  void _navigateToTafseerLibrary(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TafseerLibraryScreen(
+          downloadedTafseers: _downloadedTafseers,
+          selectedTafseerId: _selectedTafseerId,
+          onDownloadTafseer: downloadTafseer,
+          onDeleteTafseer: deleteTafseer,
+          onSelectTafseer: selectTafseer,
+        ),
+      ),
+    );
+
+    // Force rebuild after returning to ensure UI reflects changes
+    print('Returned from tafseer library');
+    print('Current state - Downloaded: $_downloadedTafseers, Selected: $_selectedTafseerId');
+    print('Available tafseer data: ${_tafseerContent.keys.toList()}');
+    setState(() {});
+  }
+
   void _toggleChrome() {
     setState(() {
       _isBottomBarVisible = !_isBottomBarVisible;
@@ -541,6 +957,8 @@ class _MyHomePageState extends State<MyHomePage> {
             weeklyAverage: _calculateWeeklyAverage().toStringAsFixed(1),
             totalAverage: _calculateTotalAverage().toStringAsFixed(1),
             allDailyReadingCounts: _khetmehDailyReadingCounts,
+            readingSessions: _readingSessions,
+            currentSessionDuration: getCurrentSessionDuration(),
           ),
           _ => SettingsTab(
               onToggleLocale: widget.onToggleLocale,
@@ -548,6 +966,9 @@ class _MyHomePageState extends State<MyHomePage> {
               isDarkMode: widget.isDarkMode,
               locale: widget.locale,
               onLocaleChanged: widget.onLocaleChanged,
+              showTasbih: _showTasbih,
+              onToggleTasbih: _toggleShowTasbih,
+              onOpenTafseerLibrary: () => _navigateToTafseerLibrary(context),
             ),
         },
       ),
@@ -628,6 +1049,19 @@ class _MyHomePageState extends State<MyHomePage> {
       onPrevious: _currentPage > 1 ? () => _goToPage(_currentPage - 1) : () {},
       bottomBarVisible: _isBottomBarVisible,
       invertColors: widget.isDarkMode,
+      bookmarks: _bookmarks,
+      isCurrentPageBookmarked: isCurrentPageBookmarked(),
+      onAddBookmark: addBookmark,
+      onRemoveBookmark: () {
+        final bookmark = getCurrentPageBookmark();
+        if (bookmark != null) removeBookmark(bookmark.id);
+      },
+      onUpdateBookmark: updateBookmark,
+      onGoToBookmark: _navigateToPage,
+      showTasbih: _showTasbih,
+      tafseerContent: getTafseerForCurrentPage(),
+      hasDownloadedTafseer: _downloadedTafseers.isNotEmpty,
+      onFetchTafseer: fetchTafseerForCurrentPage,
     );
   }
 

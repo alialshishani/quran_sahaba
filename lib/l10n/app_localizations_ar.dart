@@ -255,4 +255,179 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get close => 'إغلاق';
+
+  @override
+  String get bookmarks => 'الإشارات المرجعية';
+
+  @override
+  String get addBookmark => 'إضافة إشارة مرجعية';
+
+  @override
+  String get removeBookmark => 'إزالة الإشارة المرجعية';
+
+  @override
+  String get bookmarkAdded => 'تمت إضافة الإشارة المرجعية';
+
+  @override
+  String get bookmarkRemoved => 'تمت إزالة الإشارة المرجعية';
+
+  @override
+  String get noBookmarks =>
+      'لا توجد إشارات مرجعية حتى الآن. اضغط على أيقونة الإشارة المرجعية أثناء القراءة لحفظ صفحة.';
+
+  @override
+  String get bookmarkNote => 'ملاحظة (اختياري)';
+
+  @override
+  String get bookmarkLabel => 'تسمية (اختياري)';
+
+  @override
+  String get saveBookmark => 'حفظ';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String get editBookmark => 'تعديل الإشارة المرجعية';
+
+  @override
+  String get deleteBookmark => 'حذف الإشارة المرجعية';
+
+  @override
+  String get page => 'صفحة';
+
+  @override
+  String get readingSessions => 'جلسات القراءة';
+
+  @override
+  String get currentSession => 'الجلسة الحالية';
+
+  @override
+  String get totalReadingTime => 'إجمالي وقت القراءة';
+
+  @override
+  String get averageSessionTime => 'متوسط وقت الجلسة';
+
+  @override
+  String get longestSession => 'أطول جلسة';
+
+  @override
+  String get statsSessionsToday => 'الجلسات اليوم';
+
+  @override
+  String get statsReadingTimeToday => 'وقت القراءة اليوم';
+
+  @override
+  String minutes(Object count) {
+    return '$count دقيقة';
+  }
+
+  @override
+  String hours(Object count, Object minutes) {
+    return '$countس $minutesد';
+  }
+
+  @override
+  String get tasbihCounter => 'عداد التسبيح';
+
+  @override
+  String get reset => 'إعادة تعيين';
+
+  @override
+  String get count => 'العدد';
+
+  @override
+  String get showTasbih => 'إظهار عداد التسبيح';
+
+  @override
+  String get tasbihCounterDescription => 'عرض عداد التسبيح في القارئ';
+
+  @override
+  String get tafseer => 'التفسير';
+
+  @override
+  String get tafseerLibrary => 'مكتبة التفسير';
+
+  @override
+  String get downloadTafseer => 'تحميل التفسير';
+
+  @override
+  String get deleteTafseer => 'حذف التفسير';
+
+  @override
+  String get tafseerDownloaded => 'تم تحميل التفسير';
+
+  @override
+  String get tafseerDeleted => 'تم حذف التفسير';
+
+  @override
+  String get downloadingTafseer => 'جاري تحميل التفسير...';
+
+  @override
+  String get noTafseerAvailable => 'لا يوجد تفسير متاح لهذه الصفحة';
+
+  @override
+  String get noTafseerDownloaded =>
+      'لم يتم تحميل أي تفسير بعد. قم بالتحميل من مكتبة التفسير.';
+
+  @override
+  String get selectTafseer => 'اختر التفسير';
+
+  @override
+  String get availableTafseers => 'التفاسير المتاحة';
+
+  @override
+  String get downloadedTafseers => 'التفاسير المحملة';
+
+  @override
+  String tafseerSize(Object size) {
+    return 'الحجم: $size';
+  }
+
+  @override
+  String get download => 'تحميل';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get viewing => 'عرض';
+
+  @override
+  String get showTafseer => 'إظهار التفسير';
+
+  @override
+  String get hideTafseer => 'إخفاء التفسير';
+
+  @override
+  String tafseerForPage(Object page) {
+    return 'تفسير الصفحة $page';
+  }
+
+  @override
+  String get ayah => 'الآية';
+
+  @override
+  String get tafseerIbnKathir => 'تفسير ابن كثير';
+
+  @override
+  String get tafseerJalalayn => 'تفسير الجلالين';
+
+  @override
+  String get tafseerSaadi => 'تفسير السعدي';
+
+  @override
+  String get tafseerMuyassar => 'التفسير الميسر';
+
+  @override
+  String get englishTranslation => 'الترجمة الإنجليزية';
+
+  @override
+  String get downloading => 'جاري التحميل...';
+
+  @override
+  String get downloaded => 'تم التحميل';
+
+  @override
+  String get notDownloaded => 'غير محمل';
 }

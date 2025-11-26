@@ -255,4 +255,179 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get bookmarks => 'Bookmarks';
+
+  @override
+  String get addBookmark => 'Add Bookmark';
+
+  @override
+  String get removeBookmark => 'Remove Bookmark';
+
+  @override
+  String get bookmarkAdded => 'Bookmark added';
+
+  @override
+  String get bookmarkRemoved => 'Bookmark removed';
+
+  @override
+  String get noBookmarks =>
+      'No bookmarks yet. Tap the bookmark icon while reading to save a page.';
+
+  @override
+  String get bookmarkNote => 'Note (optional)';
+
+  @override
+  String get bookmarkLabel => 'Label (optional)';
+
+  @override
+  String get saveBookmark => 'Save';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get editBookmark => 'Edit Bookmark';
+
+  @override
+  String get deleteBookmark => 'Delete Bookmark';
+
+  @override
+  String get page => 'Page';
+
+  @override
+  String get readingSessions => 'Reading Sessions';
+
+  @override
+  String get currentSession => 'Current Session';
+
+  @override
+  String get totalReadingTime => 'Total Reading Time';
+
+  @override
+  String get averageSessionTime => 'Average Session Time';
+
+  @override
+  String get longestSession => 'Longest Session';
+
+  @override
+  String get statsSessionsToday => 'Sessions today';
+
+  @override
+  String get statsReadingTimeToday => 'Reading time today';
+
+  @override
+  String minutes(Object count) {
+    return '$count min';
+  }
+
+  @override
+  String hours(Object count, Object minutes) {
+    return '${count}h ${minutes}m';
+  }
+
+  @override
+  String get tasbihCounter => 'Tasbih Counter';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get count => 'Count';
+
+  @override
+  String get showTasbih => 'Show Tasbih Counter';
+
+  @override
+  String get tasbihCounterDescription => 'Display tasbih counter in reader';
+
+  @override
+  String get tafseer => 'Tafseer';
+
+  @override
+  String get tafseerLibrary => 'Tafseer Library';
+
+  @override
+  String get downloadTafseer => 'Download Tafseer';
+
+  @override
+  String get deleteTafseer => 'Delete Tafseer';
+
+  @override
+  String get tafseerDownloaded => 'Tafseer downloaded';
+
+  @override
+  String get tafseerDeleted => 'Tafseer deleted';
+
+  @override
+  String get downloadingTafseer => 'Downloading tafseer...';
+
+  @override
+  String get noTafseerAvailable => 'No tafseer available for this page';
+
+  @override
+  String get noTafseerDownloaded =>
+      'No tafseer downloaded yet. Download from Tafseer Library.';
+
+  @override
+  String get selectTafseer => 'Select Tafseer';
+
+  @override
+  String get availableTafseers => 'Available Tafseers';
+
+  @override
+  String get downloadedTafseers => 'Downloaded Tafseers';
+
+  @override
+  String tafseerSize(Object size) {
+    return 'Size: $size';
+  }
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get viewing => 'Viewing';
+
+  @override
+  String get showTafseer => 'Show Tafseer';
+
+  @override
+  String get hideTafseer => 'Hide Tafseer';
+
+  @override
+  String tafseerForPage(Object page) {
+    return 'Tafseer for Page $page';
+  }
+
+  @override
+  String get ayah => 'Ayah';
+
+  @override
+  String get tafseerIbnKathir => 'Tafsir Ibn Kathir';
+
+  @override
+  String get tafseerJalalayn => 'Tafsir al-Jalalayn';
+
+  @override
+  String get tafseerSaadi => 'Tafsir al-Sa\'di';
+
+  @override
+  String get tafseerMuyassar => 'Tafsir al-Muyassar';
+
+  @override
+  String get englishTranslation => 'English Translation';
+
+  @override
+  String get downloading => 'Downloading...';
+
+  @override
+  String get downloaded => 'Downloaded';
+
+  @override
+  String get notDownloaded => 'Not Downloaded';
 }

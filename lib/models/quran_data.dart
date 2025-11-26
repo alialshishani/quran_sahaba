@@ -1,6 +1,86 @@
 import 'package:quran_sahaba/l10n/app_localizations.dart';
 import 'package:quran_sahaba/models/surah_names_ar.dart';
 
+class Bookmark {
+  final String id;
+  final int page;
+  final String? label;
+  final String? note;
+  final DateTime createdAt;
+
+  const Bookmark({
+    required this.id,
+    required this.page,
+    this.label,
+    this.note,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'page': page,
+      'label': label,
+      'note': note,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  factory Bookmark.fromJson(Map<String, dynamic> json) {
+    return Bookmark(
+      id: json['id'] as String,
+      page: (json['page'] as num).toInt(),
+      label: json['label'] as String?,
+      note: json['note'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+  }
+
+  Bookmark copyWith({
+    String? id,
+    int? page,
+    String? label,
+    String? note,
+    DateTime? createdAt,
+  }) {
+    return Bookmark(
+      id: id ?? this.id,
+      page: page ?? this.page,
+      label: label ?? this.label,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+}
+
+class ReadingSession {
+  final DateTime startTime;
+  final DateTime? endTime;
+  final int durationInSeconds;
+
+  const ReadingSession({
+    required this.startTime,
+    this.endTime,
+    required this.durationInSeconds,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'startTime': startTime.toIso8601String(),
+      'endTime': endTime?.toIso8601String(),
+      'durationInSeconds': durationInSeconds,
+    };
+  }
+
+  factory ReadingSession.fromJson(Map<String, dynamic> json) {
+    return ReadingSession(
+      startTime: DateTime.parse(json['startTime'] as String),
+      endTime: json['endTime'] != null ? DateTime.parse(json['endTime'] as String) : null,
+      durationInSeconds: (json['durationInSeconds'] as num).toInt(),
+    );
+  }
+}
+
 class KhetmehPlan {
   final String id;
   final String title;
@@ -72,6 +152,199 @@ class JuzInfo {
   final int page;
 
   const JuzInfo({required this.number, required this.page});
+}
+
+class TafseerSource {
+  final String id;
+  final String nameEn;
+  final String nameAr;
+  final String language;
+  final String author;
+  final String description;
+  final double sizeInMB;
+  final bool isDownloaded;
+
+  const TafseerSource({
+    required this.id,
+    required this.nameEn,
+    required this.nameAr,
+    required this.language,
+    required this.author,
+    required this.description,
+    required this.sizeInMB,
+    this.isDownloaded = false,
+  });
+
+  TafseerSource copyWith({bool? isDownloaded}) {
+    return TafseerSource(
+      id: id,
+      nameEn: nameEn,
+      nameAr: nameAr,
+      language: language,
+      author: author,
+      description: description,
+      sizeInMB: sizeInMB,
+      isDownloaded: isDownloaded ?? this.isDownloaded,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'nameEn': nameEn,
+      'nameAr': nameAr,
+      'language': language,
+      'author': author,
+      'description': description,
+      'sizeInMB': sizeInMB,
+      'isDownloaded': isDownloaded,
+    };
+  }
+
+  factory TafseerSource.fromJson(Map<String, dynamic> json) {
+    return TafseerSource(
+      id: json['id'] as String,
+      nameEn: json['nameEn'] as String,
+      nameAr: json['nameAr'] as String,
+      language: json['language'] as String,
+      author: json['author'] as String,
+      description: json['description'] as String,
+      sizeInMB: (json['sizeInMB'] as num).toDouble(),
+      isDownloaded: json['isDownloaded'] as bool? ?? false,
+    );
+  }
+}
+
+class TafseerContent {
+  final String sourceId;
+  final int page;
+  final List<AyahTafseer> ayahs;
+
+  const TafseerContent({
+    required this.sourceId,
+    required this.page,
+    required this.ayahs,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'sourceId': sourceId,
+      'page': page,
+      'ayahs': ayahs.map((a) => a.toJson()).toList(),
+    };
+  }
+
+  factory TafseerContent.fromJson(Map<String, dynamic> json) {
+    return TafseerContent(
+      sourceId: json['sourceId'] as String,
+      page: (json['page'] as num).toInt(),
+      ayahs: (json['ayahs'] as List)
+          .map((a) => AyahTafseer.fromJson(a as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class AyahTafseer {
+  final int surahNumber;
+  final int ayahNumber;
+  final String ayahText;
+  final String tafseerText;
+
+  const AyahTafseer({
+    required this.surahNumber,
+    required this.ayahNumber,
+    required this.ayahText,
+    required this.tafseerText,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'surahNumber': surahNumber,
+      'ayahNumber': ayahNumber,
+      'ayahText': ayahText,
+      'tafseerText': tafseerText,
+    };
+  }
+
+  factory AyahTafseer.fromJson(Map<String, dynamic> json) {
+    return AyahTafseer(
+      surahNumber: (json['surahNumber'] as num).toInt(),
+      ayahNumber: (json['ayahNumber'] as num).toInt(),
+      ayahText: json['ayahText'] as String,
+      tafseerText: json['tafseerText'] as String,
+    );
+  }
+}
+
+// Available tafseer sources (from Quran.com API)
+// Resource IDs verified from: https://api.quran.com/api/v4/resources/tafsirs
+List<TafseerSource> getAvailableTafseers() {
+  return [
+    const TafseerSource(
+      id: 'ibn_kathir_ar',
+      nameEn: 'Tafsir Ibn Kathir (Arabic)',
+      nameAr: 'تفسير ابن كثير',
+      language: 'ar',
+      author: 'Ibn Kathir',
+      description: 'Authentic & comprehensive. Downloads pages 1-10 (~2 min)',
+      sizeInMB: 5.0,
+    ),
+    const TafseerSource(
+      id: 'saadi_ar',
+      nameEn: 'Tafsir al-Sa\'di (Arabic)',
+      nameAr: 'تفسير السعدي',
+      language: 'ar',
+      author: 'Abd al-Rahman al-Sa\'di',
+      description: 'Clear & easy to understand. Downloads pages 1-10 (~2 min)',
+      sizeInMB: 4.0,
+    ),
+    const TafseerSource(
+      id: 'tabari_ar',
+      nameEn: 'Tafsir al-Tabari (Arabic)',
+      nameAr: 'تفسير الطبري',
+      language: 'ar',
+      author: 'Al-Tabari',
+      description: 'Classical & detailed. Downloads pages 1-10 (~2 min)',
+      sizeInMB: 6.0,
+    ),
+    const TafseerSource(
+      id: 'muyassar_ar',
+      nameEn: 'Tafsir al-Muyassar (Arabic)',
+      nameAr: 'التفسير الميسر',
+      language: 'ar',
+      author: 'King Fahd Complex',
+      description: 'Simplified tafseer. Downloads pages 1-10 (~2 min)',
+      sizeInMB: 2.0,
+    ),
+    const TafseerSource(
+      id: 'qurtubi_ar',
+      nameEn: 'Tafsir al-Qurtubi (Arabic)',
+      nameAr: 'تفسير القرطبي',
+      language: 'ar',
+      author: 'Al-Qurtubi',
+      description: 'Comprehensive with fiqh insights. Downloads pages 1-10 (~2 min)',
+      sizeInMB: 7.0,
+    ),
+    const TafseerSource(
+      id: 'ibn_kathir_en',
+      nameEn: 'Tafsir Ibn Kathir (English)',
+      nameAr: 'تفسير ابن كثير (إنجليزي)',
+      language: 'en',
+      author: 'Ibn Kathir (Translated)',
+      description: 'English translation. Downloads pages 1-10 (~2 min)',
+      sizeInMB: 4.0,
+    ),
+    const TafseerSource(
+      id: 'maarif_en',
+      nameEn: 'Ma\'arif al-Qur\'an (English)',
+      nameAr: 'معارف القرآن (إنجليزي)',
+      language: 'en',
+      author: 'Mufti Shafi Usmani',
+      description: 'Contemporary English tafsir. Downloads pages 1-10 (~2 min)',
+      sizeInMB: 5.0,
+    ),
+  ];
 }
 
 List<KhetmehPlan> getKhetmehPlans(AppLocalizations l) {
