@@ -407,7 +407,7 @@ class _ReaderTabState extends State<ReaderTab> {
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
+      builder: (dialogContext) => Dialog(
         child: Container(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.8,
@@ -429,42 +429,44 @@ class _ReaderTabState extends State<ReaderTab> {
               if (widget.selectedTafseerId != null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: InkWell(
-                    onTap: () async {
-                      Navigator.pop(context);
-                      await _showTafseerSelectionDialog(context, l);
-                      // After selection, fetch new tafseer
-                      if (widget.selectedTafseerId != null && mounted) {
-                        await _viewTafseer(context, l);
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.swap_horiz,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              isArabic
-                                  ? getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameAr
-                                  : getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameEn,
-                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
-                              overflow: TextOverflow.ellipsis,
+                  child: Builder(
+                    builder: (chipContext) => InkWell(
+                      onTap: () {
+                        Navigator.of(chipContext).pop();
+                        if (!mounted) return;
+
+                        // Just show the tafseer selection dialog
+                        // User can tap the tafseer button again to view
+                        _showTafseerSelectionDialog(context, l);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(chipContext).colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.swap_horiz,
+                              size: 16,
+                              color: Theme.of(chipContext).colorScheme.onSurfaceVariant,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                isArabic
+                                    ? getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameAr
+                                    : getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameEn,
+                                style: Theme.of(chipContext).textTheme.labelMedium?.copyWith(
+                                      color: Theme.of(chipContext).colorScheme.onSurfaceVariant,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -475,7 +477,7 @@ class _ReaderTabState extends State<ReaderTab> {
                     : ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: widget.tafseerContent!.ayahs.length,
-                        itemBuilder: (context, index) {
+                        itemBuilder: (listContext, index) {
                           final ayah = widget.tafseerContent!.ayahs[index];
                           return Card(
                             margin: const EdgeInsets.only(bottom: 16),
@@ -565,7 +567,7 @@ class _ReaderTabState extends State<ReaderTab> {
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
+      builder: (dialogContext) => Dialog(
         child: Container(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.8,
@@ -587,42 +589,44 @@ class _ReaderTabState extends State<ReaderTab> {
               if (widget.selectedTafseerId != null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: InkWell(
-                    onTap: () async {
-                      Navigator.pop(context);
-                      await _showTafseerSelectionDialog(context, l);
-                      // After selection, fetch new tafseer
-                      if (widget.selectedTafseerId != null && mounted) {
-                        await _viewTafseer(context, l);
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.swap_horiz,
-                            size: 16,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              isArabic
-                                  ? getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameAr
-                                  : getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameEn,
-                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  ),
-                              overflow: TextOverflow.ellipsis,
+                  child: Builder(
+                    builder: (chipContext) => InkWell(
+                      onTap: () {
+                        Navigator.of(chipContext).pop();
+                        if (!mounted) return;
+
+                        // Just show the tafseer selection dialog
+                        // User can tap the tafseer button again to view
+                        _showTafseerSelectionDialog(context, l);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(chipContext).colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.swap_horiz,
+                              size: 16,
+                              color: Theme.of(chipContext).colorScheme.onSurfaceVariant,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                isArabic
+                                    ? getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameAr
+                                    : getAvailableTafseers().firstWhere((t) => t.id == widget.selectedTafseerId).nameEn,
+                                style: Theme.of(chipContext).textTheme.labelMedium?.copyWith(
+                                      color: Theme.of(chipContext).colorScheme.onSurfaceVariant,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -775,10 +779,13 @@ class _ReaderTabState extends State<ReaderTab> {
     final locale = Localizations.localeOf(context);
     final isArabic = locale.languageCode == 'ar';
     final availableTafseers = getAvailableTafseers();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    if (!mounted) return;
 
     final selected = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(l.selectTafseer),
         content: SingleChildScrollView(
           child: Column(
@@ -789,13 +796,13 @@ class _ReaderTabState extends State<ReaderTab> {
                 selected: isSelected,
                 leading: CircleAvatar(
                   backgroundColor: isSelected
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.surfaceContainerHighest,
+                      ? Theme.of(dialogContext).colorScheme.primary
+                      : Theme.of(dialogContext).colorScheme.surfaceContainerHighest,
                   child: Icon(
                     isSelected ? Icons.check : Icons.menu_book,
                     color: isSelected
-                        ? Theme.of(context).colorScheme.onPrimary
-                        : Theme.of(context).colorScheme.onSurface,
+                        ? Theme.of(dialogContext).colorScheme.onPrimary
+                        : Theme.of(dialogContext).colorScheme.onSurface,
                     size: 20,
                   ),
                 ),
@@ -806,14 +813,14 @@ class _ReaderTabState extends State<ReaderTab> {
                   ),
                 ),
                 subtitle: Text('${tafseer.author} • ${tafseer.language.toUpperCase()}'),
-                onTap: () => Navigator.pop(context, tafseer.id),
+                onTap: () => Navigator.pop(dialogContext, tafseer.id),
               );
             }).toList(),
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(l.cancel),
           ),
         ],
@@ -824,7 +831,7 @@ class _ReaderTabState extends State<ReaderTab> {
       widget.onSelectTafseer(selected);
 
       // Show snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
+      scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text(
             '${l.viewing} ${isArabic ? availableTafseers.firstWhere((t) => t.id == selected).nameAr : availableTafseers.firstWhere((t) => t.id == selected).nameEn}',

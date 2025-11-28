@@ -10,7 +10,6 @@ import 'tabs/khetmeh_tab.dart';
 import 'tabs/navigate_tab.dart';
 import 'tabs/reader_tab.dart';
 import 'tabs/stats_tab.dart';
-import 'tafseer_library_screen.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -35,10 +34,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const int _totalPages = 604;
   static const String _khetmehProgressKey = 'khetmeh_progress';
-  static const String _selectedKhetmehKey = 'selected_khetmeh_id'; // Changed to id
+  static const String _selectedKhetmehKey =
+      'selected_khetmeh_id'; // Changed to id
   static const String _khetmehCompletionCountsKey = 'khetmeh_completion_counts';
   static const String _statsStorageKey = 'reading_stats_v2'; // Updated key
-  static const String _khetmehCompletionHistoryKey = 'khetmeh_completion_history';
+  static const String _khetmehCompletionHistoryKey =
+      'khetmeh_completion_history';
   static const String _khetmehStartDatesKey = 'khetmeh_start_dates';
   static const String _khetmehActiveStatusKey = 'khetmeh_active_status';
   static const String _bookmarksKey = 'bookmarks';
@@ -55,7 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedJuzNumber = juzInfos.first.number;
   int? _pendingPage;
   bool _isBottomBarVisible = true;
-  Map<String, Map<String, int>> _khetmehDailyReadingCounts = {}; // New data structure
+  Map<String, Map<String, int>> _khetmehDailyReadingCounts =
+      {}; // New data structure
   Map<String, int> _khetmehProgress = {};
   Map<String, int> _khetmehCompletionCounts = {};
   Map<String, List<KhetmehCompletion>> _khetmehCompletionHistory = {};
@@ -69,7 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _showTasbih = false;
   List<String> _downloadedTafseers = [];
   String? _selectedTafseerId;
-  Map<String, Map<int, TafseerContent>> _tafseerContent = {}; // sourceId -> page -> content
+  Map<String, Map<int, TafseerContent>> _tafseerContent =
+      {}; // sourceId -> page -> content
   late AppLocalizations _l;
 
   @override
@@ -140,8 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _completeKhetmeh() {
-    final currentKhetmeh =
-        getKhetmehPlans(_l).firstWhere((plan) => plan.id == _selectedKhetmehId);
+    final currentKhetmeh = getKhetmehPlans(
+      _l,
+    ).firstWhere((plan) => plan.id == _selectedKhetmehId);
 
     // Calculate completion record
     final completionDate = DateTime.now();
@@ -207,10 +211,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final counts = prefs.getString(_khetmehCompletionCountsKey);
     if (counts != null) {
       setState(() {
-        _khetmehCompletionCounts =
-            (jsonDecode(counts) as Map<String, dynamic>).map(
-          (key, value) => MapEntry(key, (value as num).toInt()),
-        );
+        _khetmehCompletionCounts = (jsonDecode(counts) as Map<String, dynamic>)
+            .map((key, value) => MapEntry(key, (value as num).toInt()));
       });
     }
   }
@@ -218,7 +220,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _persistKhetmehCompletionCounts() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
-        _khetmehCompletionCountsKey, jsonEncode(_khetmehCompletionCounts));
+      _khetmehCompletionCountsKey,
+      jsonEncode(_khetmehCompletionCounts),
+    );
   }
 
   Future<void> _loadSelectedKhetmeh() async {
@@ -264,7 +268,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _persistReadingStats() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
-        _statsStorageKey, jsonEncode(_khetmehDailyReadingCounts));
+      _statsStorageKey,
+      jsonEncode(_khetmehDailyReadingCounts),
+    );
   }
 
   Future<void> _loadKhetmehCompletionHistory() async {
@@ -278,7 +284,10 @@ class _MyHomePageState extends State<MyHomePage> {
     decoded.forEach((khetmehId, completionsList) {
       if (completionsList is List) {
         tempMap[khetmehId] = completionsList
-            .map((item) => KhetmehCompletion.fromJson(item as Map<String, dynamic>))
+            .map(
+              (item) =>
+                  KhetmehCompletion.fromJson(item as Map<String, dynamic>),
+            )
             .toList();
       }
     });
@@ -346,7 +355,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _persistKhetmehActiveStatus() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_khetmehActiveStatusKey, jsonEncode(_khetmehActiveStatus));
+    await prefs.setString(
+      _khetmehActiveStatusKey,
+      jsonEncode(_khetmehActiveStatus),
+    );
   }
 
   // Bookmark methods
@@ -443,7 +455,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void _endReadingSession() {
     if (_currentSessionStartTime == null) return;
 
-    final duration = DateTime.now().difference(_currentSessionStartTime!).inSeconds;
+    final duration = DateTime.now()
+        .difference(_currentSessionStartTime!)
+        .inSeconds;
 
     // Only save sessions longer than 10 seconds
     if (duration > 10) {
@@ -546,12 +560,18 @@ class _MyHomePageState extends State<MyHomePage> {
         final Map<int, TafseerContent> pageMap = {};
         (pagesData as Map<String, dynamic>).forEach((pageStr, contentData) {
           final page = int.parse(pageStr);
-          final content = TafseerContent.fromJson(contentData as Map<String, dynamic>);
+          final content = TafseerContent.fromJson(
+            contentData as Map<String, dynamic>,
+          );
           pageMap[page] = content;
-          print('Loaded page $page for $sourceId: ${content.ayahs.length} ayahs');
+          print(
+            'Loaded page $page for $sourceId: ${content.ayahs.length} ayahs',
+          );
         });
         tempMap[sourceId] = pageMap;
-        print('Loaded tafseer for $sourceId: ${pageMap.keys.length} pages total');
+        print(
+          'Loaded tafseer for $sourceId: ${pageMap.keys.length} pages total',
+        );
       });
 
       setState(() {
@@ -591,7 +611,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // Download tafseer for all 604 pages of the Quran
       final pagesToDownload = List.generate(604, (index) => index + 1);
 
-      print('Will download ${pagesToDownload.length} pages (this will take several minutes)');
+      print(
+        'Will download ${pagesToDownload.length} pages (this will take several minutes)',
+      );
 
       // Download tafseer from Quran.com API
       final pages = await QuranApiService.downloadTafseerForPages(
@@ -664,13 +686,23 @@ class _MyHomePageState extends State<MyHomePage> {
     final content = _tafseerContent[_selectedTafseerId]?[_currentPage];
 
     if (content == null) {
-      print('No tafseer for page $_currentPage (selected: $_selectedTafseerId)');
-      print('Available pages: ${_tafseerContent[_selectedTafseerId]?.keys.toList()}');
+      print(
+        'No tafseer for page $_currentPage (selected: $_selectedTafseerId)',
+      );
+      print(
+        'Available pages: ${_tafseerContent[_selectedTafseerId]?.keys.toList()}',
+      );
     } else {
-      print('Found tafseer for page $_currentPage with ${content.ayahs.length} ayahs');
+      print(
+        'Found tafseer for page $_currentPage with ${content.ayahs.length} ayahs',
+      );
       if (content.ayahs.isEmpty) {
-        print('WARNING: Content exists for page $_currentPage but has 0 ayahs!');
-        print('Content details - sourceId: ${content.sourceId}, page: ${content.page}');
+        print(
+          'WARNING: Content exists for page $_currentPage but has 0 ayahs!',
+        );
+        print(
+          'Content details - sourceId: ${content.sourceId}, page: ${content.page}',
+        );
       }
     }
 
@@ -732,7 +764,9 @@ class _MyHomePageState extends State<MyHomePage> {
     final updatedPage = actualIndex + 1;
 
     // Detect if we wrapped from page 604 to page 1 (moving forward)
-    if (_currentPage == _totalPages && updatedPage == 1 && index > _currentPage - 1) {
+    if (_currentPage == _totalPages &&
+        updatedPage == 1 &&
+        index > _currentPage - 1) {
       // User swiped forward from page 604 to page 1
       if (_selectedKhetmehId.isNotEmpty) {
         // Complete khetmeh if one is selected
@@ -827,7 +861,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
       // Add to completion history
-      _khetmehCompletionCounts[planId] = (_khetmehCompletionCounts[planId] ?? 0) + 1;
+      _khetmehCompletionCounts[planId] =
+          (_khetmehCompletionCounts[planId] ?? 0) + 1;
 
       if (!_khetmehCompletionHistory.containsKey(planId)) {
         _khetmehCompletionHistory[planId] = [];
@@ -859,8 +894,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _l = AppLocalizations.of(context)!;
     final bool showChrome = _tabIndex == 0 ? _isBottomBarVisible : true;
     final selectedKhetmehPlan = _selectedKhetmehId.isNotEmpty
-        ? getKhetmehPlans(AppLocalizations.of(context)!)
-            .firstWhere((plan) => plan.id == _selectedKhetmehId)
+        ? getKhetmehPlans(
+            AppLocalizations.of(context)!,
+          ).firstWhere((plan) => plan.id == _selectedKhetmehId)
         : null;
 
     return Scaffold(
@@ -888,11 +924,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text(
                       selectedKhetmehPlan.title,
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.7),
-                          ),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
                     ),
                 ],
               )
@@ -905,17 +940,17 @@ class _MyHomePageState extends State<MyHomePage> {
         child: switch (_tabIndex) {
           0 => _buildReaderTab(),
           1 => KhetmehTab(
-              onPlanSelected: _handlePlanSelected,
-              khetmehProgress: _khetmehProgress,
-              khetmehDailyReadingCounts: _khetmehDailyReadingCounts,
-              khetmehCompletionCounts: _khetmehCompletionCounts,
-              khetmehCompletionHistory: _khetmehCompletionHistory,
-              khetmehStartDates: _khetmehStartDates,
-              khetmehActiveStatus: _khetmehActiveStatus,
-              onStartKhetmeh: _handleStartKhetmeh,
-              onCompleteKhetmeh: _handleCompleteKhetmeh,
-              onEndKhetmeh: _handleEndKhetmeh,
-            ),
+            onPlanSelected: _handlePlanSelected,
+            khetmehProgress: _khetmehProgress,
+            khetmehDailyReadingCounts: _khetmehDailyReadingCounts,
+            khetmehCompletionCounts: _khetmehCompletionCounts,
+            khetmehCompletionHistory: _khetmehCompletionHistory,
+            khetmehStartDates: _khetmehStartDates,
+            khetmehActiveStatus: _khetmehActiveStatus,
+            onStartKhetmeh: _handleStartKhetmeh,
+            onCompleteKhetmeh: _handleCompleteKhetmeh,
+            onEndKhetmeh: _handleEndKhetmeh,
+          ),
           2 => NavigateTab(
             selectedSurahNumber: _selectedSurahNumber,
             selectedJuzNumber: _selectedJuzNumber,
@@ -940,14 +975,14 @@ class _MyHomePageState extends State<MyHomePage> {
             currentSessionDuration: getCurrentSessionDuration(),
           ),
           _ => SettingsTab(
-              onToggleLocale: widget.onToggleLocale,
-              onToggleTheme: widget.onToggleTheme,
-              isDarkMode: widget.isDarkMode,
-              locale: widget.locale,
-              onLocaleChanged: widget.onLocaleChanged,
-              showTasbih: _showTasbih,
-              onToggleTasbih: _toggleShowTasbih,
-            ),
+            onToggleLocale: widget.onToggleLocale,
+            onToggleTheme: widget.onToggleTheme,
+            isDarkMode: widget.isDarkMode,
+            locale: widget.locale,
+            onLocaleChanged: widget.onLocaleChanged,
+            showTasbih: _showTasbih,
+            onToggleTasbih: _toggleShowTasbih,
+          ),
         },
       ),
       bottomNavigationBar: MediaQuery.removePadding(
@@ -1038,7 +1073,7 @@ class _MyHomePageState extends State<MyHomePage> {
       onGoToBookmark: _navigateToPage,
       showTasbih: _showTasbih,
       tafseerContent: getTafseerForCurrentPage(),
-      hasDownloadedTafseer: _downloadedTafseers.isNotEmpty,
+      hasDownloadedTafseer: true,
       onFetchTafseer: fetchTafseerForCurrentPage,
       selectedTafseerId: _selectedTafseerId,
       onSelectTafseer: selectTafseer,
@@ -1073,7 +1108,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_pageController.hasClients) {
       // Calculate the target index in the infinite scroll
       // We want to maintain the current "cycle" when jumping
-      final currentIndex = _pageController.page?.round() ?? (_totalPages * 1000);
+      final currentIndex =
+          _pageController.page?.round() ?? (_totalPages * 1000);
       final currentCycle = currentIndex ~/ _totalPages;
       final targetIndex = (currentCycle * _totalPages) + (page - 1);
 
@@ -1106,10 +1142,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _recordReadingActivity() {
-    if (_selectedKhetmehId.isEmpty) return; // Only record if a khetmeh is selected
+    if (_selectedKhetmehId.isEmpty) {
+      return; // Only record if a khetmeh is selected
+    }
 
     // Check if selected khetmeh is active (Free Roam is always active)
-    final isActive = _selectedKhetmehId == 'plan5' ? true : (_khetmehActiveStatus[_selectedKhetmehId] ?? true);
+    final isActive = _selectedKhetmehId == 'plan5'
+        ? true
+        : (_khetmehActiveStatus[_selectedKhetmehId] ?? true);
     if (!isActive) return; // Don't record stats for inactive khetmehs
 
     final today = _todayKey;

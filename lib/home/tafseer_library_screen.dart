@@ -23,7 +23,7 @@ class TafseerLibraryScreen extends StatefulWidget {
 }
 
 class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
-  Set<String> _downloading = {};
+  final Set<String> _downloading = {};
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +37,7 @@ class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l.tafseerLibrary),
-      ),
+      appBar: AppBar(title: Text(l.tafseerLibrary)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -49,12 +47,10 @@ class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
-            ...downloadedTafseers.map((tafseer) => _buildTafseerCard(
-                  context,
-                  l,
-                  tafseer,
-                  isDownloaded: true,
-                )),
+            ...downloadedTafseers.map(
+              (tafseer) =>
+                  _buildTafseerCard(context, l, tafseer, isDownloaded: true),
+            ),
             const SizedBox(height: 24),
           ],
           Text(
@@ -72,12 +68,10 @@ class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
               ),
             )
           else
-            ...notDownloadedTafseers.map((tafseer) => _buildTafseerCard(
-                  context,
-                  l,
-                  tafseer,
-                  isDownloaded: false,
-                )),
+            ...notDownloadedTafseers.map(
+              (tafseer) =>
+                  _buildTafseerCard(context, l, tafseer, isDownloaded: false),
+            ),
         ],
       ),
     );
@@ -95,9 +89,7 @@ class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
     final isSelected = widget.selectedTafseerId == tafseer.id;
 
     return Card(
-      color: isSelected
-          ? Theme.of(context).colorScheme.primaryContainer
-          : null,
+      color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: isDownloaded
@@ -143,49 +135,49 @@ class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : isDownloaded
-                ? PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'delete') {
-                        _showDeleteConfirmation(context, l, tafseer);
-                      } else if (value == 'select') {
-                        widget.onSelectTafseer(tafseer.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${l.viewing} ${isArabic ? tafseer.nameAr : tafseer.nameEn}',
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      if (!isSelected)
-                        PopupMenuItem(
-                          value: 'select',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.visibility),
-                              const SizedBox(width: 8),
-                              Text(l.selectTafseer),
-                            ],
-                          ),
-                        ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            const Icon(Icons.delete),
-                            const SizedBox(width: 8),
-                            Text(l.delete),
-                          ],
+            ? PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'delete') {
+                    _showDeleteConfirmation(context, l, tafseer);
+                  } else if (value == 'select') {
+                    widget.onSelectTafseer(tafseer.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${l.viewing} ${isArabic ? tafseer.nameAr : tafseer.nameEn}',
                         ),
                       ),
-                    ],
-                  )
-                : IconButton(
-                    icon: const Icon(Icons.download),
-                    onPressed: () => _downloadTafseer(context, l, tafseer),
+                    );
+                  }
+                },
+                itemBuilder: (context) => [
+                  if (!isSelected)
+                    PopupMenuItem(
+                      value: 'select',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.visibility),
+                          const SizedBox(width: 8),
+                          Text(l.selectTafseer),
+                        ],
+                      ),
+                    ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.delete),
+                        const SizedBox(width: 8),
+                        Text(l.delete),
+                      ],
+                    ),
                   ),
+                ],
+              )
+            : IconButton(
+                icon: const Icon(Icons.download),
+                onPressed: () => _downloadTafseer(context, l, tafseer),
+              ),
         isThreeLine: true,
         onTap: isDownloaded && !isSelected
             ? () {
@@ -215,9 +207,9 @@ class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
     try {
       await widget.onDownloadTafseer(tafseer);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l.tafseerDownloaded)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l.tafseerDownloaded)));
       }
     } catch (e) {
       if (mounted) {
@@ -246,9 +238,7 @@ class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l.deleteTafseer),
-        content: Text(
-          'Delete ${isArabic ? tafseer.nameAr : tafseer.nameEn}?',
-        ),
+        content: Text('Delete ${isArabic ? tafseer.nameAr : tafseer.nameEn}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -258,9 +248,9 @@ class _TafseerLibraryScreenState extends State<TafseerLibraryScreen> {
             onPressed: () {
               widget.onDeleteTafseer(tafseer.id);
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l.tafseerDeleted)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(l.tafseerDeleted)));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
