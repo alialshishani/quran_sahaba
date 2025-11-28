@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:quran_sahaba/l10n/app_localizations.dart';
 import 'package:quran_sahaba/models/quran_data.dart';
 
@@ -100,7 +101,7 @@ class _ReaderTabState extends State<ReaderTab> {
               },
             ),
           ),
-          // Bookmark button (top-right)
+          // Bookmark and Tafseer buttons (top-right)
           Positioned(
             top: 16,
             right: 16,
@@ -110,6 +111,37 @@ class _ReaderTabState extends State<ReaderTab> {
                 ignoring: !widget.bottomBarVisible,
                 child: Row(
                   children: [
+                    // Tafseer button
+                    if (widget.hasDownloadedTafseer)
+                      Builder(
+                        builder: (btnContext) => FloatingActionButton.small(
+                          heroTag: 'tafseer_button',
+                          onPressed: () async {
+                            // If no tafseer is selected, show selection dialog
+                            if (widget.selectedTafseerId == null) {
+                              await _showTafseerSelectionDialog(btnContext, l);
+                              // After selection, automatically fetch and show
+                              if (widget.selectedTafseerId != null && mounted) {
+                                await _viewTafseer(btnContext, l);
+                              }
+                              return;
+                            }
+
+                            // Tafseer is selected, fetch and show it
+                            await _viewTafseer(btnContext, l);
+                          },
+                          backgroundColor: widget.tafseerContent != null
+                              ? Theme.of(btnContext).colorScheme.primaryContainer
+                              : Theme.of(btnContext).colorScheme.surface.withValues(alpha: 0.9),
+                          child: Icon(
+                            Icons.menu_book,
+                            color: widget.tafseerContent != null
+                                ? Theme.of(btnContext).colorScheme.onPrimaryContainer
+                                : Theme.of(btnContext).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    if (widget.hasDownloadedTafseer) const SizedBox(width: 8),
                     // Bookmarks list button
                     FloatingActionButton.small(
                       heroTag: 'bookmarks_list',
@@ -194,52 +226,6 @@ class _ReaderTabState extends State<ReaderTab> {
                             ],
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          // Tafseer button (bottom-right)
-          if (widget.hasDownloadedTafseer)
-            Positioned(
-              right: 16,
-              bottom: 100,
-              child: Opacity(
-                opacity: widget.bottomBarVisible ? 1.0 : 0.0,
-                child: IgnorePointer(
-                  ignoring: !widget.bottomBarVisible,
-                  child: GestureDetector(
-                    onLongPress: () async {
-                      // Long press to change tafseer
-                      await _showTafseerSelectionDialog(context, l);
-                    },
-                    child: FloatingActionButton(
-                      heroTag: 'tafseer_button',
-                      onPressed: () async {
-                        print('Tafseer button tapped for page ${widget.currentPage}');
-
-                        // If no tafseer is selected, show selection dialog
-                        if (widget.selectedTafseerId == null) {
-                          await _showTafseerSelectionDialog(context, l);
-                          // After selection, automatically fetch and show
-                          if (widget.selectedTafseerId != null) {
-                            await _viewTafseer(context, l);
-                          }
-                          return;
-                        }
-
-                        // Tafseer is selected, fetch and show it
-                        await _viewTafseer(context, l);
-                      },
-                    backgroundColor: widget.tafseerContent != null
-                        ? Theme.of(context).colorScheme.primaryContainer
-                        : Theme.of(context).colorScheme.surfaceContainerHighest,
-                      child: Icon(
-                        Icons.menu_book,
-                        color: widget.tafseerContent != null
-                            ? Theme.of(context).colorScheme.onPrimaryContainer
-                            : Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -536,12 +522,16 @@ class _ReaderTabState extends State<ReaderTab> {
                                         ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Text(
-                                    ayah.tafseerText,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(height: 1.8),
+                                  Html(
+                                    data: ayah.tafseerText,
+                                    style: {
+                                      "body": Style(
+                                        margin: Margins.zero,
+                                        padding: HtmlPaddings.zero,
+                                        fontSize: FontSize(Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14.0),
+                                        lineHeight: const LineHeight(1.8),
+                                      ),
+                                    },
                                   ),
                                 ],
                               ),
@@ -692,12 +682,16 @@ class _ReaderTabState extends State<ReaderTab> {
                                   ),
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              ayah.tafseerText,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(height: 1.8),
+                            Html(
+                              data: ayah.tafseerText,
+                              style: {
+                                "body": Style(
+                                  margin: Margins.zero,
+                                  padding: HtmlPaddings.zero,
+                                  fontSize: FontSize(Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14.0),
+                                  lineHeight: const LineHeight(1.8),
+                                ),
+                              },
                             ),
                           ],
                         ),
